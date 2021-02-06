@@ -5,14 +5,14 @@ import * as fs from "fs";
 export function activate(context: vscode.ExtensionContext) {
     let disposable = vscode.commands.registerCommand("vs-dynamo.visualize", () => {
         console.log("Command vs-dynamo.visualize started");
-        const srcWebviewUri = vscode.Uri.joinPath(context.extensionUri, "src", "webview");
+        const mediaUri = vscode.Uri.joinPath(context.extensionUri, "media");
         const panel = vscode.window.createWebviewPanel("dynamoViz", "Dynamo", vscode.ViewColumn.Active, {
             enableScripts: true,
-            localResourceRoots: [srcWebviewUri],
+            localResourceRoots: [mediaUri],
         });
 
-        const webviewHtmlUri = vscode.Uri.joinPath(srcWebviewUri, "index.html");
-        const webviewJsUri = vscode.Uri.joinPath(srcWebviewUri, "webview.js");
+        const webviewHtmlUri = vscode.Uri.joinPath(mediaUri, "index.html");
+        const webviewJsUri = vscode.Uri.joinPath(mediaUri, "webview.js");
         const webviewJsSrc = panel.webview.asWebviewUri(webviewJsUri);
         panel.webview.html = getWebviewContent(panel.webview, webviewHtmlUri, webviewJsSrc);
     });

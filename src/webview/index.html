@@ -5,12 +5,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
             http-equiv="Content-Security-Policy"
-            content="default-src 'none'; style-src ${webview.cspSource}; img-src ${webview.cspSource} https:; script-src ${webview.cspSource};"
+            content="default-src 'none'; style-src ${webview.cspSource}; img-src ${webview.cspSource} https:; script-src ${webview.cspSource} 'nonce-${nonce}';"
         />
     </head>
     <body>
         <h1 id="lines-of-code-counter">0</h1>
         <canvas id="dynamo-canvas"></canvas>
         <script nonce="${nonce}" src="${webviewScriptJs}"></script>
+        <script nonce="${nonce}">
+            main();
+        </script>
     </body>
 </html>

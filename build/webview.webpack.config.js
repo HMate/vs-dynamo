@@ -3,10 +3,11 @@
 "use strict";
 
 const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 /**@type {import('webpack').Configuration}*/
 const config = {
-    target: "node", // vscode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
+    target: "node",
     mode: "none", // this leaves the source code as close as possible to the original (when packaging we set this to 'production')
 
     entry: "./src/webview/webview.ts",
@@ -14,7 +15,7 @@ const config = {
         // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
         path: path.resolve(__dirname, "..", "media"),
         filename: "webview.js",
-        libraryTarget: "commonjs2",
+        libraryTarget: "window",
     },
     devtool: "nosources-source-map",
     externals: {
@@ -40,5 +41,12 @@ const config = {
             },
         ],
     },
+    plugins: [
+        new HtmlWebpackPlugin({
+            filename: "./index.html",
+            template: "./src/webview/index.html",
+            inject: false,
+        }),
+    ],
 };
 module.exports = config;
