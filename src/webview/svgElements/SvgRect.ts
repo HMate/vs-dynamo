@@ -10,18 +10,18 @@ export class SvgRect extends SvgVisualElement implements Rect {
     }
 
     get width(): number {
-        return parseFloat(this.rectElem.getAttribute("width") ?? "0");
+        return this.getNumberAttribute("width");
     }
 
     set width(value: number) {
-        this.rectElem.setAttribute("width", value.toString());
+        this.setAttribute("width", value);
     }
 
     get height(): number {
-        return parseFloat(this.rectElem.getAttribute("height") ?? "0");
+        return this.getNumberAttribute("height");
     }
 
     set height(value: number) {
-        this.rectElem.setAttribute("height", value.toString());
+        this.setAttribute("height", value);
     }
 }
