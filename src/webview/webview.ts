@@ -9,5 +9,5 @@ export function main() {
     }
     const builder = new SvgVisualizationBuilder(svgRoot);
     const visualizer = new DynamoDiagramVisualizer(builder);
-    visualizer.drawEntity();
+    visualizer.addEntity();
 }

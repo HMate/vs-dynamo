@@ -3,7 +3,9 @@
 "use strict";
 
 const path = require("path");
+const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 /**@type {import('webpack').Configuration}*/
 const config = {
@@ -39,6 +41,11 @@ const config = {
             {
                 test: /\.html$/,
             },
+            {
+                test: /\.(scss|css)$/,
+                exclude: /node_modules/,
+                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+            },
         ],
     },
     plugins: [
@@ -47,6 +54,8 @@ const config = {
             template: "./src/webview/index.html",
             inject: false,
         }),
+        new webpack.HotModuleReplacementPlugin(),
+        new MiniCssExtractPlugin({ filename: "webview-style.css" }),
     ],
 };
 module.exports = config;

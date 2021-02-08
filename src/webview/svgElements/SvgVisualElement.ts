@@ -1,8 +1,7 @@
 import { SvgInHtml } from "../utils";
-import { VisualElement } from "../visualizationElements/VisualElement";
 import * as _ from "lodash";
 
-export class SvgVisualElement implements VisualElement {
+export class SvgVisualElement {
     protected domElem: SVGElement;
 
     constructor(elem: string) {
@@ -13,12 +12,14 @@ export class SvgVisualElement implements VisualElement {
         return this.domElem;
     }
 
-    public addClass(className: string) {
+    public addClass(className: string): SvgVisualElement {
         this.domElem.setAttribute("class", className);
+        return this;
     }
 
-    public setAttribute(name: string, value: string | number) {
+    public setAttribute(name: string, value: string | number): SvgVisualElement {
         this.domElem.setAttribute(name, value.toString());
+        return this;
     }
 
     public getNumberAttribute(name: string, defaultValue: number = 0): number {

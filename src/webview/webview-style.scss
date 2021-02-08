@@ -1,0 +1,36 @@
+$entity-color: #b7e3c0;
+$slot-color: #a8dcf8;
+$validation-color: #dbbae5;
+$constraint-color: #f2c778;
+$value-color: #fff9ab;
+$meta-value-color: #b1b1b1;
+
+$cloned-slot-color: #a8dcf8;
+$specialized-slot-color: #f2c778;
+$partitioned-slot-color: #f2c778;
+$omitted-slot-color: #944f14;
+
+$containment-color: #0e99da;
+
+html,
+body,
+.dynamo-svg-root {
+    height: 100%;
+    width: 100%;
+}
+
+.dynamo-svg-root {
+    background-color: whitesmoke;
+}
+
+.dynamo-entity {
+    fill: $entity-color;
+    stroke: black;
+    stroke-width: 2;
+}
+
+.dynamo-slot {
+    fill: $slot-color;
+    stroke: black;
+    stroke-width: 2;
+}

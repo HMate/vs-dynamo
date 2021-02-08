@@ -1,7 +1,6 @@
-import { Rect } from "../visualizationElements/Rect";
 import { SvgVisualElement } from "./SvgVisualElement";
 
-export class SvgRect extends SvgVisualElement implements Rect {
+export class SvgRect extends SvgVisualElement {
     private rectElem: SVGRectElement;
 
     constructor() {
@@ -10,7 +9,7 @@ export class SvgRect extends SvgVisualElement implements Rect {
     }
 
     get width(): number {
-        return this.getNumberAttribute("width");
+        return parseFloat(this.domElem.style.height);
     }
 
     set width(value: number) {
@@ -18,7 +17,7 @@ export class SvgRect extends SvgVisualElement implements Rect {
     }
 
     get height(): number {
-        return this.getNumberAttribute("height");
+        return parseFloat(this.domElem.style.height);
     }
 
     set height(value: number) {
