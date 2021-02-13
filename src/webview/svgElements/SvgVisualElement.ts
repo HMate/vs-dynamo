@@ -22,6 +22,14 @@ export class SvgVisualElement {
         return this;
     }
 
+    get width(): number {
+        return this.domElem.getBoundingClientRect().width;
+    }
+
+    get height(): number {
+        return this.domElem.getBoundingClientRect().height;
+    }
+
     public getNumberAttribute(name: string, defaultValue: number = 0): number {
         let value = this.domElem.getAttribute(name);
         if (value == null) {
@@ -38,11 +46,11 @@ export class SvgVisualElement {
         return value;
     }
 
-    public posX(value: number) {
+    set posX(value: number) {
         this.setAttribute("x", value);
     }
 
-    public posY(value: number) {
+    set posY(value: number) {
         this.setAttribute("y", value);
     }
 }
