@@ -2,6 +2,7 @@ import { SvgVisualElement } from "./svgElements/SvgVisualElement";
 import { SvgRect } from "./svgElements/SvgRect";
 import { SvgInHtml } from "./utils";
 import { SvgGroup } from "./svgElements/SvgGroup";
+import { SvgText } from "./svgElements/SvgText";
 
 export class SvgVisualizationBuilder {
     constructor(private readonly root: SvgInHtml) {
@@ -16,6 +17,12 @@ export class SvgVisualizationBuilder {
     public createGroup(): SvgGroup {
         let child = new SvgGroup();
         this.root.appendChild(child.getDomElem());
+        return child;
+    }
+
+    public createText(text: string): SvgText {
+        let child = new SvgText();
+        child.text(text);
         return child;
     }
 

@@ -9,11 +9,11 @@ export class SvgRect extends SvgVisualElement {
     }
 
     get width(): number {
-        return parseFloat(this.domElem.style.height);
+        return parseFloat(this.domElem.style.width);
     }
 
     set width(value: number) {
-        this.setAttribute("width", value);
+        this.domElem.style.width = value.toString();
     }
 
     get height(): number {
@@ -21,6 +21,6 @@ export class SvgRect extends SvgVisualElement {
     }
 
     set height(value: number) {
-        this.setAttribute("height", value);
+        this.domElem.style.height = value.toString();
     }
 }

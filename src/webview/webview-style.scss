@@ -29,8 +29,17 @@ body,
     stroke-width: 2;
 }
 
+.dynamo-entity-name {
+    font-size: 26px;
+    text-anchor: middle;
+}
+
 .dynamo-slot {
     fill: $slot-color;
     stroke: black;
     stroke-width: 2;
+}
+
+.dynamo-slot-name {
+    font-size: 22px;
 }

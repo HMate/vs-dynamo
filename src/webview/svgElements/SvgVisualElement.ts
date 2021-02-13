@@ -37,4 +37,12 @@ export class SvgVisualElement {
         }
         return value;
     }
+
+    public posX(value: number) {
+        this.setAttribute("x", value);
+    }
+
+    public posY(value: number) {
+        this.setAttribute("y", value);
+    }
 }
