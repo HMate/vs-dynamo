@@ -3,6 +3,7 @@
 "use strict";
 
 const path = require("path");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 /**@type {import('webpack').Configuration}*/
 const config = {
@@ -37,5 +38,6 @@ const config = {
             },
         ],
     },
+    plugins: [new CleanWebpackPlugin()],
 };
 module.exports = config;

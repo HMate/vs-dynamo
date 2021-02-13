@@ -6,6 +6,7 @@ const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 /**@type {import('webpack').Configuration}*/
 const config = {
@@ -54,6 +55,7 @@ const config = {
             template: "./src/webview/index.html",
             inject: false,
         }),
+        new CleanWebpackPlugin(),
         new webpack.HotModuleReplacementPlugin(),
         new MiniCssExtractPlugin({ filename: "webview-style.css" }),
     ],
