@@ -32,6 +32,7 @@ function updateViewHtml(panel: vscode.WebviewPanel, mediaUri: vscode.Uri) {
     const webviewJsSrc = panel.webview.asWebviewUri(webviewJsUri);
     const styleCssUri = vscode.Uri.joinPath(mediaUri, "webview-style.css");
     const styleCssSrc = panel.webview.asWebviewUri(styleCssUri);
+    console.log("Generating webview vs-dynamo");
     panel.webview.html = getWebviewContent(panel.webview, webviewHtmlUri, webviewJsSrc, styleCssSrc);
 }
 
@@ -51,6 +52,10 @@ function getWebviewContent(
 }
 
 function getNonce(): string {
-    let text = "9mIk3vIHBpl3Nox4V8vaKPXqK3uApnpc";
+    let text = "";
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (let i = 0; i < 32; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
     return text;
 }

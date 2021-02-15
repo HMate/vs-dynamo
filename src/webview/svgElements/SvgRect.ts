@@ -8,10 +8,6 @@ export class SvgRect extends SvgVisualElement {
         this.rectElem = this.domElem as SVGRectElement;
     }
 
-    public onDrag(callback: (e: DragEvent) => void) {
-        this.rectElem.ondrag = callback;
-    }
-
     get width(): number {
         return parseFloat(this.rectElem.style.width);
     }

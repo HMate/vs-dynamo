@@ -1,5 +1,7 @@
 import { SvgGroup } from "./svgElements/SvgGroup";
+import { SvgRect } from "./svgElements/SvgRect";
 import { SvgVisualizationBuilder } from "./SvgVisualizationBuilder";
+import { Point } from "./utils";
 import "./webview-style.scss";
 
 const enum MouseButton {
@@ -40,6 +42,9 @@ export class DynamoDiagramVisualizer {
         this.builder.addChildToGroup(group, entity);
         this.builder.addChildToGroup(group, entityName);
 
+        this.addEntityMovementHandlers(group, entity);
+
+        // Add slots
         const slotHeight = 40;
         let slot = this.createSlot("SomeSlot");
         slot.posY = 50;
@@ -49,6 +54,12 @@ export class DynamoDiagramVisualizer {
         slot2.posY = slotHeight + 50;
         this.builder.addChildToGroup(group, slot2);
 
+        let op = this.createValidation("SomeOperation");
+        op.posY = slotHeight * 2 + 50;
+        this.builder.addChildToGroup(group, op);
+    }
+
+    private addEntityMovementHandlers(group: SvgGroup, entity: SvgRect) {
         let hasMouse = false;
         let pivot = { x: 0, y: 0 };
         entity.getDomElem().onmousedown = (e: MouseEvent) => {
@@ -75,12 +86,47 @@ export class DynamoDiagramVisualizer {
     private createSlot(name: string): SvgGroup {
         let group = this.builder.createGroup();
         let slot = this.builder.createRect();
+        this.builder.addChildToGroup(group, slot);
         slot.width = 300;
         slot.height = 40;
         slot.addClass("dynamo-slot");
 
         let slotName = this.builder.createText(name);
+        this.builder.addChildToGroup(group, slotName);
         slotName.addClass("dynamo-slot-name");
+        slotName.posY = 28;
+        slotName.posX = 10;
+
+        let valueSlot = this.builder.createPolygon(this.createHexagonShape(75, 40, 10));
+        valueSlot.addClass("dynamo-slot-value");
+        this.builder.addChildToGroup(group, valueSlot);
+        valueSlot.posX = slot.width - valueSlot.width;
+
+        return group;
+    }
+
+    private createHexagonShape(width: number, height: number, steep: number): Array<Point> {
+        let widthHalf = width / 2;
+        let heightHalf = height / 2;
+        return [
+            [0, heightHalf],
+            [steep, 0],
+            [width - steep, 0],
+            [width, heightHalf],
+            [width - steep, height],
+            [steep, height],
+        ];
+    }
+
+    private createValidation(name: string): SvgGroup {
+        let group = this.builder.createGroup();
+        let slot = this.builder.createRect();
+        slot.width = 300;
+        slot.height = 40;
+        slot.addClass("dynamo-validation");
+
+        let slotName = this.builder.createText(name);
+        slotName.addClass("dynamo-validation-name");
         slotName.posY = 28;
         slotName.posX = 10;
 

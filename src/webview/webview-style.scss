@@ -43,3 +43,19 @@ body,
 .dynamo-slot-name {
     font-size: 22px;
 }
+
+.dynamo-slot-value {
+    stroke-width: 2;
+    stroke: black;
+    fill: $slot-color;
+}
+
+.dynamo-validation {
+    fill: $validation-color;
+    stroke: black;
+    stroke-width: 2;
+}
+
+.dynamo-validation-name {
+    font-size: 22px;
+}
