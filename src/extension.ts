@@ -1,9 +1,8 @@
 import * as vscode from "vscode";
-import * as path from "path";
 import * as fs from "fs";
 
 export function activate(context: vscode.ExtensionContext) {
-    let cachedPanel: vscode.WebviewPanel;
+    let cachedPanel: vscode.WebviewPanel | null = null;
     let disposable = vscode.commands.registerCommand("vs-dynamo.visualize", () => {
         console.log("Command vs-dynamo.visualize started");
 
@@ -15,6 +14,10 @@ export function activate(context: vscode.ExtensionContext) {
             });
         }
         updateViewHtml(cachedPanel, mediaUri);
+
+        cachedPanel.onDidDispose(() => {
+            cachedPanel = null;
+        });
     });
 
     context.subscriptions.push(disposable);

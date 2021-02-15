@@ -5,9 +5,7 @@ import { SvgGroup } from "./svgElements/SvgGroup";
 import { SvgText } from "./svgElements/SvgText";
 
 export class SvgVisualizationBuilder {
-    constructor(private readonly root: SvgInHtml) {
-        //this.root.setAttribute("width");
-    }
+    constructor(readonly root: SvgInHtml) {}
 
     public createRect(): SvgRect {
         let child = new SvgRect();

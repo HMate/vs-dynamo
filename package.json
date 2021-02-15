@@ -19,6 +19,12 @@
                 "command": "vs-dynamo.visualize",
                 "title": "Visualize a DMLA script"
             }
+        ],
+        "keybindings": [
+            {
+                "command": "vs-dynamo.visualize",
+                "key": "ctrl+alt+d"
+            }
         ]
     },
     "scripts": {

@@ -64,7 +64,7 @@ export class DynamoDiagramVisualizer {
             }
         };
 
-        entity.getDomElem().onmousemove = (e: MouseEvent) => {
+        this.builder.root.onmousemove = (e: MouseEvent) => {
             if (hasMouse) {
                 group.posX = e.offsetX - pivot.x;
                 group.posY = e.offsetY - pivot.y;

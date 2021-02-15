@@ -56,7 +56,6 @@ const config = {
             inject: false,
         }),
         new CleanWebpackPlugin(),
-        new webpack.HotModuleReplacementPlugin(),
         new MiniCssExtractPlugin({ filename: "webview-style.css" }),
     ],
 };
