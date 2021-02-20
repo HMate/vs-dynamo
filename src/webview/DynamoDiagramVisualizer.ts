@@ -36,6 +36,13 @@ export class DynamoDiagramVisualizer {
     constructor(private readonly builder: SvgVisualizationBuilder) {}
 
     public addEntity() {
+        // TODO: Icons
+        // TODO: Expand slots/validations
+        // TODO: Resize width/height based on number of slots, slot text
+        // TODO: constraints
+        // TODO: Layout multiple entities
+        // TODO: Entity inheritance arrows
+        // TODO: Entity containment arrows
         // NOTE for coordinates: origin is in left-bottom
 
         let group = this.builder.createGroup();
