@@ -50,6 +50,17 @@ body,
     fill: $slot-color;
 }
 
+.dynamo-slot-filled-value {
+    stroke-width: 2;
+    stroke: black;
+    fill: $value-color;
+}
+
+.dynamo-slot-value-text {
+    font-size: 20px;
+    text-anchor: middle;
+}
+
 .dynamo-validation {
     fill: $validation-color;
     stroke: black;

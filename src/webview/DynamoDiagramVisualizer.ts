@@ -1,4 +1,5 @@
 import { SvgGroup } from "./svgElements/SvgGroup";
+import { SvgPolygon } from "./svgElements/SvgPolygon";
 import { SvgRect } from "./svgElements/SvgRect";
 import { SvgVisualizationBuilder } from "./SvgVisualizationBuilder";
 import { Point } from "./utils";
@@ -18,6 +19,17 @@ const enum MouseButtons {
     RIGHT = 4,
     SIDE_BACK = 8,
     SIDE_FORWARD = 16,
+}
+
+interface ValueDescription {
+    text: string;
+    new?: boolean;
+}
+
+interface SlotDescription {
+    name: string;
+    type: "slot" | "validation";
+    value?: ValueDescription;
 }
 
 export class DynamoDiagramVisualizer {
@@ -44,19 +56,14 @@ export class DynamoDiagramVisualizer {
 
         this.addEntityMovementHandlers(group, entity);
 
-        // Add slots
-        const slotHeight = 40;
-        let slot = this.createSlot("SomeSlot");
-        slot.posY = 50;
-        this.builder.addChildToGroup(group, slot);
-
-        let slot2 = this.createSlot("SomeOtherSlot");
-        slot2.posY = slotHeight + 50;
-        this.builder.addChildToGroup(group, slot2);
-
-        let op = this.createValidation("SomeOperation");
-        op.posY = slotHeight * 2 + 50;
-        this.builder.addChildToGroup(group, op);
+        const slots: SlotDescription[] = [
+            { name: "SomeSlot", type: "slot" },
+            { name: "SomeOtherSlot", type: "slot", value: { text: "23" } },
+            { name: "NumeroTres", type: "slot", value: { text: "23", new: true } },
+            { name: "SomeOperation", type: "validation" },
+            { name: "SomeOperation2", type: "validation" },
+        ];
+        this.createSlots(group, slots);
     }
 
     private addEntityMovementHandlers(group: SvgGroup, entity: SvgRect) {
@@ -83,7 +90,23 @@ export class DynamoDiagramVisualizer {
         };
     }
 
-    private createSlot(name: string): SvgGroup {
+    private createSlots(entityGroup: SvgGroup, slots: SlotDescription[]) {
+        const slotHeight = 40;
+        let currentPosY = 50; // starting from bottom of entity name label
+        for (const desc of slots) {
+            let slot: SvgGroup;
+            if (desc.type === "slot") {
+                slot = this.createSlot(desc.name, desc.value);
+            } else {
+                slot = this.createValidation(desc.name);
+            }
+            slot.posY = currentPosY;
+            this.builder.addChildToGroup(entityGroup, slot);
+            currentPosY += slotHeight;
+        }
+    }
+
+    private createSlot(name: string, value?: ValueDescription): SvgGroup {
         let group = this.builder.createGroup();
         let slot = this.builder.createRect();
         this.builder.addChildToGroup(group, slot);
@@ -97,12 +120,31 @@ export class DynamoDiagramVisualizer {
         slotName.posY = 28;
         slotName.posX = 10;
 
-        let valueSlot = this.builder.createPolygon(this.createHexagonShape(75, 40, 10));
-        valueSlot.addClass("dynamo-slot-value");
+        let valueSlot = this.createSlotValue(value);
         this.builder.addChildToGroup(group, valueSlot);
         valueSlot.posX = slot.width - valueSlot.width;
 
         return group;
+    }
+
+    private createSlotValue(value?: ValueDescription): SvgGroup {
+        let valueGroup = this.builder.createGroup();
+        let valueSlot = this.builder.createPolygon(this.createHexagonShape(75, 40, 10));
+        if (value?.new) {
+            valueSlot.addClass("dynamo-slot-filled-value");
+        } else {
+            valueSlot.addClass("dynamo-slot-value");
+        }
+        this.builder.addChildToGroup(valueGroup, valueSlot);
+
+        if (value?.text != null) {
+            let valueText = this.builder.createText(value?.text);
+            this.builder.addChildToGroup(valueGroup, valueText);
+            valueText.addClass("dynamo-slot-value-text");
+            valueText.posY = 28;
+            valueText.posX = valueSlot.width / 2;
+        }
+        return valueGroup;
     }
 
     private createHexagonShape(width: number, height: number, steep: number): Array<Point> {
