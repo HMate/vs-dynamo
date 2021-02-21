@@ -1,4 +1,4 @@
-import { DynamoDiagramVisualizer } from "./DynamoDiagramVisualizer";
+import { DynamoDiagramVisualizer } from "./dynamo/DynamoDiagramVisualizer";
 import { SvgVisualizationBuilder } from "./SvgVisualizationBuilder";
 import { SvgInHtml } from "./utils";
 

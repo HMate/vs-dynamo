@@ -1,8 +1,9 @@
-import { SvgGroup } from "./svgElements/SvgGroup";
-import { SvgPolygon } from "./svgElements/SvgPolygon";
-import { SvgRect } from "./svgElements/SvgRect";
-import { SvgVisualizationBuilder } from "./SvgVisualizationBuilder";
-import { Point } from "./utils";
+import { SvgGroup } from "../svgElements/SvgGroup";
+import { SvgPolygon } from "../svgElements/SvgPolygon";
+import { SvgRect } from "../svgElements/SvgRect";
+import { SvgVisualizationBuilder } from "../SvgVisualizationBuilder";
+import { Point } from "../utils";
+import { SvgShapeBuilder } from "./ShapeBuilder";
 import "./webview-style.scss";
 
 const enum MouseButton {
@@ -33,16 +34,22 @@ interface SlotDescription {
 }
 
 export class DynamoDiagramVisualizer {
-    constructor(private readonly builder: SvgVisualizationBuilder) {}
+    private readonly dynamoShapeBuilder: SvgShapeBuilder;
+
+    constructor(private readonly builder: SvgVisualizationBuilder) {
+        this.dynamoShapeBuilder = new SvgShapeBuilder(builder);
+    }
 
     public addEntity() {
         // TODO: Icons
         // TODO: Expand slots/validations
         // TODO: Resize width/height based on number of slots, slot text
         // TODO: constraints
+
         // TODO: Layout multiple entities
         // TODO: Entity inheritance arrows
         // TODO: Entity containment arrows
+
         // NOTE for coordinates: origin is in left-bottom
 
         let group = this.builder.createGroup();
@@ -135,36 +142,21 @@ export class DynamoDiagramVisualizer {
     }
 
     private createSlotValue(value?: ValueDescription): SvgGroup {
-        let valueGroup = this.builder.createGroup();
-        let valueSlot = this.builder.createPolygon(this.createHexagonShape(75, 40, 10));
+        let valueSlot = this.dynamoShapeBuilder.createHexagon();
         if (value?.new) {
             valueSlot.addClass("dynamo-slot-filled-value");
         } else {
             valueSlot.addClass("dynamo-slot-value");
         }
-        this.builder.addChildToGroup(valueGroup, valueSlot);
 
         if (value?.text != null) {
             let valueText = this.builder.createText(value?.text);
-            this.builder.addChildToGroup(valueGroup, valueText);
+            this.builder.addChildToGroup(valueSlot, valueText);
             valueText.addClass("dynamo-slot-value-text");
             valueText.posY = 28;
             valueText.posX = valueSlot.width / 2;
         }
-        return valueGroup;
-    }
-
-    private createHexagonShape(width: number, height: number, steep: number): Array<Point> {
-        let widthHalf = width / 2;
-        let heightHalf = height / 2;
-        return [
-            [0, heightHalf],
-            [steep, 0],
-            [width - steep, 0],
-            [width, heightHalf],
-            [width - steep, height],
-            [steep, height],
-        ];
+        return valueSlot;
     }
 
     private createValidation(name: string): SvgGroup {
