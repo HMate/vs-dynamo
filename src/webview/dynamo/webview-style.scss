@@ -87,6 +87,12 @@ body,
     text-anchor: middle;
 }
 
+.dynamo-constraint-holder polygon {
+    stroke-width: 2;
+    stroke: black;
+    fill: $slot-color;
+}
+
 .dynamo-validation {
     fill: $validation-color;
     stroke: black;

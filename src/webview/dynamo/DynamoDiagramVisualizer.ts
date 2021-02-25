@@ -1,4 +1,3 @@
-import { SignatureHelpContext } from "vscode";
 import { SvgGroup } from "../svgElements/SvgGroup";
 import { SvgPolygon } from "../svgElements/SvgPolygon";
 import { SvgRect } from "../svgElements/SvgRect";
@@ -36,6 +35,10 @@ interface ValueDescription {
     new?: boolean;
 }
 
+interface ConstraintDescription {
+    name: string;
+}
+
 interface AbstractSlotDescription {
     name: string;
     type: "slot" | "validation";
@@ -61,6 +64,7 @@ export class DynamoDiagramVisualizer {
 
     public addEntity() {
         // TODO: Expand slots/validations
+        // TODO: Zoom, pan camera
         // TODO: Resize width/height based on number of slots, slot text
         // TODO: constraints
 
@@ -91,12 +95,18 @@ export class DynamoDiagramVisualizer {
         const slots: Array<SlotDescription | ValidationDescription> = [
             { name: "SomeSlot", type: "slot", relation: SlotRelationship.CLONE },
             { name: "SomeOtherSlot", type: "slot", value: { text: "23" }, relation: SlotRelationship.SPECIALIZE },
-            { name: "NewSlot", type: "slot", value: { text: "23", new: true }, relation: SlotRelationship.PARTITION },
+            {
+                name: "NewSlot",
+                type: "slot",
+                value: { text: "$SomeVal", new: true },
+                relation: SlotRelationship.PARTITION,
+            },
             { name: "NumeroTres", type: "slot", value: { text: "#3", new: true }, relation: SlotRelationship.OMIT },
             { name: "SomeOperation", type: "validation" },
             { name: "SomeOperation2", type: "validation" },
         ];
         this.createSlots(group, slots);
+        entity.height = group.height + 30;
     }
 
     private addEntityMovementHandlers(group: SvgGroup, entity: SvgRect) {
@@ -124,7 +134,6 @@ export class DynamoDiagramVisualizer {
     }
 
     private createSlots(entityGroup: SvgGroup, slots: Array<SlotDescription | ValidationDescription>) {
-        const slotHeight = 40;
         let currentPosY = 50; // starting from bottom of entity name label
         for (const desc of slots) {
             let slot: SvgGroup;
@@ -135,7 +144,7 @@ export class DynamoDiagramVisualizer {
             }
             slot.posY = currentPosY;
             this.builder.addChildToGroup(entityGroup, slot);
-            currentPosY += slotHeight;
+            currentPosY += slot.height;
         }
     }
 
@@ -160,7 +169,18 @@ export class DynamoDiagramVisualizer {
         this.builder.addChildToGroup(group, valueSlot);
         valueSlot.posX = slot.width - valueSlot.width;
 
+        let cholder = this.createSlotConstraintHolder([]);
+        cholder.posX = 25;
+        cholder.posY = slot.height;
+        this.builder.addChildToGroup(group, cholder);
+
         return group;
+    }
+
+    private createSlotConstraintHolder(constraints: Array<ConstraintDescription>) {
+        let holder = this.dynamoShapeBuilder.createConstraintHolder();
+        holder.addClass("dynamo-constraint-holder");
+        return holder;
     }
 
     private createSlotIcon(relationship: SlotRelationship): SvgGroup {
