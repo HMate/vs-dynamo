@@ -14,6 +14,10 @@ export class SvgGroup extends SvgVisualElement {
         this.gElem.appendChild(child.getDomElem());
     }
 
+    get children() {
+        return Array.from(this.gElem.children);
+    }
+
     set posX(value: number) {
         this.pos.x = value;
         this.updatePos();

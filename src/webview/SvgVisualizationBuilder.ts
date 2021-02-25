@@ -17,6 +17,10 @@ export class SvgVisualizationBuilder {
         this.root.appendChild(child.getDomElem());
     }
 
+    public removeFromRoot(child: SvgVisualElement) {
+        this.root.removeChild(child.getDomElem());
+    }
+
     public createRect(): SvgRect {
         let child = new SvgRect();
         return child;

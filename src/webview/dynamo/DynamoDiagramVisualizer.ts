@@ -1,9 +1,16 @@
+import { getVSCodeDownloadUrl } from "vscode-test/out/util";
 import { SvgGroup } from "../svgElements/SvgGroup";
-import { SvgPolygon } from "../svgElements/SvgPolygon";
 import { SvgRect } from "../svgElements/SvgRect";
 import { SvgText } from "../svgElements/SvgText";
 import { SvgVisualizationBuilder } from "../SvgVisualizationBuilder";
-import { Point } from "../utils";
+import {
+    ConstraintDescription,
+    EntityDescription,
+    SlotDescription,
+    SlotList,
+    SlotRelationship,
+    ValueDescription,
+} from "./Descriptors";
 import { SvgShapeBuilder } from "./ShapeBuilder";
 import "./webview-style.scss";
 
@@ -23,38 +30,6 @@ const enum MouseButtons {
     SIDE_FORWARD = 16,
 }
 
-const enum SlotRelationship {
-    CLONE = "clone",
-    OMIT = "omit",
-    SPECIALIZE = "specialize",
-    PARTITION = "partition",
-}
-
-interface ValueDescription {
-    text: string;
-    new?: boolean;
-}
-
-interface ConstraintDescription {
-    name: string;
-}
-
-interface AbstractSlotDescription {
-    name: string;
-    type: "slot" | "validation";
-}
-
-interface SlotDescription extends AbstractSlotDescription {
-    type: "slot";
-    relation: SlotRelationship;
-    value?: ValueDescription;
-}
-
-interface ValidationDescription extends AbstractSlotDescription {
-    type: "validation";
-    value?: ValueDescription;
-}
-
 export class DynamoDiagramVisualizer {
     private readonly dynamoShapeBuilder: SvgShapeBuilder;
 
@@ -62,18 +37,20 @@ export class DynamoDiagramVisualizer {
         this.dynamoShapeBuilder = new SvgShapeBuilder(builder);
     }
 
-    public addEntity() {
+    public addEntity(desc: EntityDescription) {
         // TODO: Expand slots/validations
         // TODO: Zoom, pan camera
         // TODO: Resize width/height based on number of slots, slot text
         // TODO: constraints
-
         // TODO: Layout multiple entities
         // TODO: Entity inheritance arrows
         // TODO: Entity containment arrows
-
         // NOTE for coordinates: origin is in left-bottom
 
+        this.createEntity(desc);
+    }
+
+    private createEntity(desc: EntityDescription) {
         let group = this.builder.createGroup();
         let entity = this.builder.createRect();
         entity.width = 300;
@@ -81,7 +58,7 @@ export class DynamoDiagramVisualizer {
         entity.setAttribute("rx", 15);
         entity.addClass("dynamo-entity");
 
-        let entityName = this.builder.createText("SomeEntity");
+        let entityName = this.builder.createText(desc.name);
         entityName.addClass("dynamo-entity-name");
         entityName.posY = 30;
         entityName.posX = entity.width / 2;
@@ -92,21 +69,11 @@ export class DynamoDiagramVisualizer {
 
         this.addEntityMovementHandlers(group, entity);
 
-        const slots: Array<SlotDescription | ValidationDescription> = [
-            { name: "SomeSlot", type: "slot", relation: SlotRelationship.CLONE },
-            { name: "SomeOtherSlot", type: "slot", value: { text: "23" }, relation: SlotRelationship.SPECIALIZE },
-            {
-                name: "NewSlot",
-                type: "slot",
-                value: { text: "$SomeVal", new: true },
-                relation: SlotRelationship.PARTITION,
-            },
-            { name: "NumeroTres", type: "slot", value: { text: "#3", new: true }, relation: SlotRelationship.OMIT },
-            { name: "SomeOperation", type: "validation" },
-            { name: "SomeOperation2", type: "validation" },
-        ];
-        this.createSlots(group, slots);
+        this.createSlots(group, desc.slots);
         entity.height = group.height + 30;
+
+        this.addSlotExpansionHandlers(group, desc);
+        return group;
     }
 
     private addEntityMovementHandlers(group: SvgGroup, entity: SvgRect) {
@@ -133,7 +100,36 @@ export class DynamoDiagramVisualizer {
         };
     }
 
-    private createSlots(entityGroup: SvgGroup, slots: Array<SlotDescription | ValidationDescription>) {
+    private addSlotExpansionHandlers(entityGroup: SvgGroup, entityDesc: EntityDescription) {
+        for (const child of entityGroup.children) {
+            let elems = Array.from(child.getElementsByClassName("dynamo-slot"));
+
+            if (elems.length > 0) {
+                let rectElem = (child as SVGGElement).getElementsByTagName("rect").item(0);
+                if (rectElem == null) return;
+                rectElem.onclick = () => {
+                    let nameElem = child.getElementsByClassName("dynamo-slot-name").item(0);
+                    console.log(`Cliecked {nameElem}`);
+                    let name = nameElem?.textContent ?? "";
+
+                    for (const slot of entityDesc.slots) {
+                        if (slot.type == "slot" && slot.name == name) {
+                            console.log(`slot change`);
+                            slot.expanded = !slot.expanded;
+                        }
+                    }
+
+                    let entity = this.createEntity(entityDesc);
+                    entity.posX = entityGroup.posX;
+                    entity.posY = entityGroup.posY;
+                    this.builder.removeFromRoot(entityGroup);
+                    this.builder.addChildToRoot(entity);
+                };
+            }
+        }
+    }
+
+    private createSlots(entityGroup: SvgGroup, slots: SlotList) {
         let currentPosY = 50; // starting from bottom of entity name label
         for (const desc of slots) {
             let slot: SvgGroup;
@@ -169,11 +165,12 @@ export class DynamoDiagramVisualizer {
         this.builder.addChildToGroup(group, valueSlot);
         valueSlot.posX = slot.width - valueSlot.width;
 
-        let cholder = this.createSlotConstraintHolder([]);
-        cholder.posX = 25;
-        cholder.posY = slot.height;
-        this.builder.addChildToGroup(group, cholder);
-
+        if (desc.expanded) {
+            let cholder = this.createSlotConstraintHolder([]);
+            cholder.posX = 25;
+            cholder.posY = slot.height;
+            this.builder.addChildToGroup(group, cholder);
+        }
         return group;
     }
 

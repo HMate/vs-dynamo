@@ -43,6 +43,7 @@ body,
 .dynamo-slot-icon > text {
     font-size: 22px;
     text-anchor: middle;
+    user-select: none;
 }
 
 .dynamo-slot-icon > circle {
