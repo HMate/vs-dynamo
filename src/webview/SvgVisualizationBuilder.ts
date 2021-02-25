@@ -4,6 +4,7 @@ import { Point, SvgInHtml } from "./utils";
 import { SvgGroup } from "./svgElements/SvgGroup";
 import { SvgText } from "./svgElements/SvgText";
 import { SvgPolygon } from "./svgElements/SvgPolygon";
+import { SvgCircle } from "./svgElements/SvgCircle";
 
 export class SvgVisualizationBuilder {
     constructor(readonly root: SvgInHtml) {}
@@ -18,6 +19,11 @@ export class SvgVisualizationBuilder {
 
     public createRect(): SvgRect {
         let child = new SvgRect();
+        return child;
+    }
+
+    public createCircle(): SvgCircle {
+        let child = new SvgCircle();
         return child;
     }
 

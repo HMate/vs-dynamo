@@ -1,6 +1,8 @@
+import { SignatureHelpContext } from "vscode";
 import { SvgGroup } from "../svgElements/SvgGroup";
 import { SvgPolygon } from "../svgElements/SvgPolygon";
 import { SvgRect } from "../svgElements/SvgRect";
+import { SvgText } from "../svgElements/SvgText";
 import { SvgVisualizationBuilder } from "../SvgVisualizationBuilder";
 import { Point } from "../utils";
 import { SvgShapeBuilder } from "./ShapeBuilder";
@@ -22,14 +24,31 @@ const enum MouseButtons {
     SIDE_FORWARD = 16,
 }
 
+const enum SlotRelationship {
+    CLONE = "clone",
+    OMIT = "omit",
+    SPECIALIZE = "specialize",
+    PARTITION = "partition",
+}
+
 interface ValueDescription {
     text: string;
     new?: boolean;
 }
 
-interface SlotDescription {
+interface AbstractSlotDescription {
     name: string;
     type: "slot" | "validation";
+}
+
+interface SlotDescription extends AbstractSlotDescription {
+    type: "slot";
+    relation: SlotRelationship;
+    value?: ValueDescription;
+}
+
+interface ValidationDescription extends AbstractSlotDescription {
+    type: "validation";
     value?: ValueDescription;
 }
 
@@ -41,7 +60,6 @@ export class DynamoDiagramVisualizer {
     }
 
     public addEntity() {
-        // TODO: Icons
         // TODO: Expand slots/validations
         // TODO: Resize width/height based on number of slots, slot text
         // TODO: constraints
@@ -70,10 +88,11 @@ export class DynamoDiagramVisualizer {
 
         this.addEntityMovementHandlers(group, entity);
 
-        const slots: SlotDescription[] = [
-            { name: "SomeSlot", type: "slot" },
-            { name: "SomeOtherSlot", type: "slot", value: { text: "23" } },
-            { name: "NumeroTres", type: "slot", value: { text: "23", new: true } },
+        const slots: Array<SlotDescription | ValidationDescription> = [
+            { name: "SomeSlot", type: "slot", relation: SlotRelationship.CLONE },
+            { name: "SomeOtherSlot", type: "slot", value: { text: "23" }, relation: SlotRelationship.SPECIALIZE },
+            { name: "NewSlot", type: "slot", value: { text: "23", new: true }, relation: SlotRelationship.PARTITION },
+            { name: "NumeroTres", type: "slot", value: { text: "#3", new: true }, relation: SlotRelationship.OMIT },
             { name: "SomeOperation", type: "validation" },
             { name: "SomeOperation2", type: "validation" },
         ];
@@ -104,13 +123,13 @@ export class DynamoDiagramVisualizer {
         };
     }
 
-    private createSlots(entityGroup: SvgGroup, slots: SlotDescription[]) {
+    private createSlots(entityGroup: SvgGroup, slots: Array<SlotDescription | ValidationDescription>) {
         const slotHeight = 40;
         let currentPosY = 50; // starting from bottom of entity name label
         for (const desc of slots) {
             let slot: SvgGroup;
             if (desc.type === "slot") {
-                slot = this.createSlot(desc.name, desc.value);
+                slot = this.createSlot(desc);
             } else {
                 slot = this.createValidation(desc.name);
             }
@@ -120,7 +139,7 @@ export class DynamoDiagramVisualizer {
         }
     }
 
-    private createSlot(name: string, value?: ValueDescription): SvgGroup {
+    private createSlot(desc: SlotDescription): SvgGroup {
         let group = this.builder.createGroup();
         let slot = this.builder.createRect();
         this.builder.addChildToGroup(group, slot);
@@ -128,16 +147,53 @@ export class DynamoDiagramVisualizer {
         slot.height = 40;
         slot.addClass("dynamo-slot");
 
-        let slotName = this.builder.createText(name);
+        let icon = this.createSlotIcon(desc.relation);
+        this.builder.addChildToGroup(group, icon);
+
+        let slotName = this.builder.createText(desc.name);
         this.builder.addChildToGroup(group, slotName);
         slotName.addClass("dynamo-slot-name");
         slotName.posY = 28;
-        slotName.posX = 10;
+        slotName.posX = 10 + icon.width;
 
-        let valueSlot = this.createSlotValue(value);
+        let valueSlot = this.createSlotValue(desc.value);
         this.builder.addChildToGroup(group, valueSlot);
         valueSlot.posX = slot.width - valueSlot.width;
 
+        return group;
+    }
+
+    private createSlotIcon(relationship: SlotRelationship): SvgGroup {
+        let group = this.builder.createGroup();
+        group.addClass("dynamo-slot-icon");
+        let icon = this.builder.createCircle();
+        icon.radius = 20;
+        icon.posX = icon.radius;
+        icon.posY = icon.radius;
+        let iconText: SvgText;
+        switch (relationship) {
+            case SlotRelationship.CLONE:
+                iconText = this.builder.createText("C");
+                icon.addClass("dynamo-slot-icon-clone");
+                break;
+            case SlotRelationship.OMIT:
+                iconText = this.builder.createText("O");
+                icon.addClass("dynamo-slot-icon-omit");
+                break;
+            case SlotRelationship.SPECIALIZE:
+                iconText = this.builder.createText("S");
+                icon.addClass("dynamo-slot-icon-specialize");
+                break;
+            case SlotRelationship.PARTITION:
+            default:
+                iconText = this.builder.createText("P");
+                icon.addClass("dynamo-slot-icon-partition");
+                break;
+        }
+        this.builder.addChildToGroup(group, icon);
+        this.builder.addChildToGroup(group, iconText);
+        iconText.posX = icon.radius;
+        iconText.posY = icon.radius + iconText.height / 4;
         return group;
     }
 

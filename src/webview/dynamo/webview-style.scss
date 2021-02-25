@@ -7,7 +7,7 @@ $meta-value-color: #b1b1b1;
 
 $cloned-slot-color: #a8dcf8;
 $specialized-slot-color: #f2c778;
-$partitioned-slot-color: #f2c778;
+$partitioned-slot-color: #cc9838;
 $omitted-slot-color: #944f14;
 
 $containment-color: #0e99da;
@@ -37,7 +37,33 @@ body,
 .dynamo-slot {
     fill: $slot-color;
     stroke: black;
-    stroke-width: 2;
+    stroke-width: 1;
+}
+
+.dynamo-slot-icon > text {
+    font-size: 22px;
+    text-anchor: middle;
+}
+
+.dynamo-slot-icon > circle {
+    stroke: black;
+    stroke-width: 1;
+}
+
+.dynamo-slot-icon-clone {
+    fill: $cloned-slot-color;
+}
+
+.dynamo-slot-icon-omit {
+    fill: $omitted-slot-color;
+}
+
+.dynamo-slot-icon-specialize {
+    fill: $specialized-slot-color;
+}
+
+.dynamo-slot-icon-partition {
+    fill: $partitioned-slot-color;
 }
 
 .dynamo-slot-name {
