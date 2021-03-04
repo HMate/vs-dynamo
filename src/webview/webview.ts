@@ -1,16 +1,28 @@
 import { EntityDescription, SlotRelationship } from "./dynamo/Descriptors";
 import { DynamoDiagramVisualizer } from "./dynamo/DynamoDiagramVisualizer";
 import { SvgVisualizationBuilder } from "./SvgVisualizationBuilder";
-import { SvgInHtml } from "./utils";
+import TextToSVG from "./TextToSvg";
+import "./font/RobotoMono.ttf";
 
-export function main() {
-    const svgRoot = document.getElementById("dynamo-svg") as SvgInHtml;
+export function main(mediaUri: string) {
+    const svgRoot = document.getElementById("dynamo-svg");
     if (svgRoot == null) {
         return;
     }
-    const builder = new SvgVisualizationBuilder(svgRoot);
-    builder.addCameraHandlers();
-    const visualizer = new DynamoDiagramVisualizer(builder);
+
+    TextToSVG.load(`${mediaUri}/font/RobotoMono.ttf`, (err: any, tts: TextToSVG | null) => {
+        if (err || tts == null) {
+            console.error(`Error while loading opentype text: ${err} | ${tts}`);
+            return;
+        }
+        buildVisualization(svgRoot.id, tts);
+    });
+}
+
+function buildVisualization(svgId: string, tts: TextToSVG) {
+    const builder = new SvgVisualizationBuilder(`#${svgId}`);
+    //builder.addCameraHandlers();
+    const visualizer = new DynamoDiagramVisualizer(builder, tts);
 
     let entity: EntityDescription = {
         name: "SomeEntity",

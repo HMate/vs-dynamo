@@ -1,3 +1,5 @@
+import { G, Rect, Text } from "@svgdotjs/svg.js";
+import "@svgdotjs/svg.draggable.js";
 import { SvgGroup } from "../svgElements/SvgGroup";
 import { SvgRect } from "../svgElements/SvgRect";
 import { SvgText } from "../svgElements/SvgText";
@@ -13,11 +15,12 @@ import {
 } from "./Descriptors";
 import { SvgShapeBuilder } from "./ShapeBuilder";
 import "./webview-style.scss";
+import TextToSVG from "../TextToSvg";
 
 export class DynamoDiagramVisualizer {
     private readonly dynamoShapeBuilder: SvgShapeBuilder;
 
-    constructor(private readonly builder: SvgVisualizationBuilder) {
+    constructor(private readonly builder: SvgVisualizationBuilder, private textToSVG: TextToSVG) {
         this.dynamoShapeBuilder = new SvgShapeBuilder(builder);
     }
 
@@ -37,120 +40,81 @@ export class DynamoDiagramVisualizer {
     private createEntity(desc: EntityDescription) {
         let group = this.builder.createGroup();
         let entity = this.builder.createRect();
-        entity.width = 300;
-        entity.height = 300;
-        entity.setAttribute("rx", 15);
+        entity.width(300);
+        entity.height(300);
+        entity.radius(15);
         entity.addClass("dynamo-entity");
 
         let entityName = this.builder.createText(desc.name);
         entityName.addClass("dynamo-entity-name");
-        entityName.posY = 30;
-        entityName.posX = entity.width / 2;
+        entityName.center(entity.width() / 2, 10);
 
         this.builder.addChildToRoot(group);
         this.builder.addChildToGroup(group, entity);
         this.builder.addChildToGroup(group, entityName);
 
-        this.addEntityMovementHandlers(group, entity, desc);
+        this.addEntityMovementHandlers(group);
 
         this.createSlots(group, desc.slots);
-        entity.height = group.height + 30;
+        entity.height(group.height() + 30);
 
-        this.addSlotExpansionHandlers(group, desc);
+        // this.addSlotExpansionHandlers(group, desc);
         return group;
     }
 
-    private addEntityMovementHandlers(group: SvgGroup, entity: SvgRect, desc: EntityDescription) {
-        let hasMouse = false;
-        let pivot = { x: 0, y: 0 };
-        entity.getDomElem().onmousedown = (e: MouseEvent) => {
-            if (e.button == MouseButton.LEFT) {
-                hasMouse = true;
-                let scale = this.builder.root.getViewportScale();
-                console.log(`==========================================`);
-                console.log(`SET offset: ${e.offsetX}`);
-                console.log(`SET client: ${e.clientX}`);
-                console.log(`SET page: ${e.pageX}`);
-                console.log(`SET group.posX: ${group.posX}`);
-                pivot = { x: e.offsetX - group.posX, y: e.offsetY - group.posY };
-            }
-        };
-
-        entity.getDomElem().onmouseup = (e: MouseEvent) => {
-            if (e.button == MouseButton.LEFT) {
-                hasMouse = false;
-            }
-        };
-
-        window.onkeydown = (e: KeyboardEvent) => {
-            if (e.key === "Escape") {
-                hasMouse = false;
-            }
-        };
-
-        this.builder.root.addMouseMovementHandler(desc.name, (e: MouseEvent) => {
-            if (hasMouse) {
-                let scale = this.builder.root.getViewportScale();
-                console.log(`...`);
-                console.log(`MOVE offset: ${e.offsetX}`);
-                console.log(`MOVE screenX: ${e.screenX}`);
-                console.log(`MOVE group.posX: ${group.posX}`);
-                console.log(`MOVE pivot.x: ${pivot.x}`);
-                group.posX = e.offsetX - pivot.x;
-                group.posY = e.offsetY - pivot.y;
-            }
-        });
+    private addEntityMovementHandlers(group: G) {
+        group.draggable();
     }
 
-    private addSlotExpansionHandlers(entityGroup: SvgGroup, entityDesc: EntityDescription) {
-        for (const child of entityGroup.children) {
-            let elems = Array.from(child.getElementsByClassName("dynamo-slot"));
+    // private addSlotExpansionHandlers(entityGroup: SvgGroup, entityDesc: EntityDescription) {
+    //     for (const child of entityGroup.children) {
+    //         let elems = Array.from(child.getElementsByClassName("dynamo-slot"));
 
-            if (elems.length > 0) {
-                let rectElem = (child as SVGGElement).getElementsByTagName("rect").item(0);
-                if (rectElem == null) return;
-                rectElem.onclick = () => {
-                    let nameElem = child.getElementsByClassName("dynamo-slot-name").item(0);
-                    let name = nameElem?.textContent ?? "";
+    //         if (elems.length > 0) {
+    //             let rectElem = (child as SVGGElement).getElementsByTagName("rect").item(0);
+    //             if (rectElem == null) return;
+    //             rectElem.onclick = () => {
+    //                 let nameElem = child.getElementsByClassName("dynamo-slot-name").item(0);
+    //                 let name = nameElem?.textContent ?? "";
 
-                    for (const slot of entityDesc.slots) {
-                        if (slot.type == "slot" && slot.name == name) {
-                            console.log(`slot change`);
-                            slot.expanded = !slot.expanded;
-                        }
-                    }
+    //                 for (const slot of entityDesc.slots) {
+    //                     if (slot.type == "slot" && slot.name == name) {
+    //                         console.log(`slot change`);
+    //                         slot.expanded = !slot.expanded;
+    //                     }
+    //                 }
 
-                    let entity = this.createEntity(entityDesc);
-                    entity.posX = entityGroup.posX;
-                    entity.posY = entityGroup.posY;
-                    this.builder.removeFromRoot(entityGroup);
-                    this.builder.addChildToRoot(entity);
-                };
-            }
-        }
-    }
+    //                 let entity = this.createEntity(entityDesc);
+    //                 entity.posX = entityGroup.posX;
+    //                 entity.posY = entityGroup.posY;
+    //                 this.builder.removeFromRoot(entityGroup);
+    //                 this.builder.addChildToRoot(entity);
+    //             };
+    //         }
+    //     }
+    // }
 
-    private createSlots(entityGroup: SvgGroup, slots: SlotList) {
+    private createSlots(entityGroup: G, slots: SlotList) {
         let currentPosY = 50; // starting from bottom of entity name label
         for (const desc of slots) {
-            let slot: SvgGroup;
+            let slot: G;
             if (desc.type === "slot") {
                 slot = this.createSlot(desc);
             } else {
                 slot = this.createValidation(desc.name);
             }
-            slot.posY = currentPosY;
+            slot.y(currentPosY);
             this.builder.addChildToGroup(entityGroup, slot);
-            currentPosY += slot.height;
+            currentPosY += slot.height();
         }
     }
 
-    private createSlot(desc: SlotDescription): SvgGroup {
+    private createSlot(desc: SlotDescription): G {
         let group = this.builder.createGroup();
         let slot = this.builder.createRect();
         this.builder.addChildToGroup(group, slot);
-        slot.width = 300;
-        slot.height = 40;
+        slot.width(300);
+        slot.height(40);
         slot.addClass("dynamo-slot");
 
         let icon = this.createSlotIcon(desc.relation);
@@ -159,36 +123,35 @@ export class DynamoDiagramVisualizer {
         let slotName = this.builder.createText(desc.name);
         this.builder.addChildToGroup(group, slotName);
         slotName.addClass("dynamo-slot-name");
-        slotName.posY = 28;
-        slotName.posX = 10 + icon.width;
+        slotName.x(10 + icon.width());
 
         let valueSlot = this.createSlotValue(desc.value);
         this.builder.addChildToGroup(group, valueSlot);
-        valueSlot.posX = slot.width - valueSlot.width;
+        valueSlot.x(slot.width() - valueSlot.width());
 
-        if (desc.expanded) {
-            let cholder = this.createSlotConstraintHolder([]);
-            cholder.posX = 25;
-            cholder.posY = slot.height;
-            this.builder.addChildToGroup(group, cholder);
-        }
+        // if (desc.expanded) {
+        //     let cholder = this.createSlotConstraintHolder([]);
+        //     cholder.posX = 25;
+        //     cholder.posY = slot.height;
+        //     this.builder.addChildToGroup(group, cholder);
+        // }
         return group;
     }
 
-    private createSlotConstraintHolder(constraints: Array<ConstraintDescription>) {
-        let holder = this.dynamoShapeBuilder.createConstraintHolder();
-        holder.addClass("dynamo-constraint-holder");
-        return holder;
-    }
+    // private createSlotConstraintHolder(constraints: Array<ConstraintDescription>) {
+    //     let holder = this.dynamoShapeBuilder.createConstraintHolder();
+    //     holder.addClass("dynamo-constraint-holder");
+    //     return holder;
+    // }
 
-    private createSlotIcon(relationship: SlotRelationship): SvgGroup {
+    private createSlotIcon(relationship: SlotRelationship): G {
         let group = this.builder.createGroup();
         group.addClass("dynamo-slot-icon");
         let icon = this.builder.createCircle();
-        icon.radius = 20;
-        icon.posX = icon.radius;
-        icon.posY = icon.radius;
-        let iconText: SvgText;
+        let rad = 20;
+        icon.radius(rad);
+        icon.center(rad, rad);
+        let iconText: Text;
         switch (relationship) {
             case SlotRelationship.CLONE:
                 iconText = this.builder.createText("C");
@@ -200,6 +163,7 @@ export class DynamoDiagramVisualizer {
                 break;
             case SlotRelationship.SPECIALIZE:
                 iconText = this.builder.createText("S");
+
                 icon.addClass("dynamo-slot-icon-specialize");
                 break;
             case SlotRelationship.PARTITION:
@@ -210,12 +174,11 @@ export class DynamoDiagramVisualizer {
         }
         this.builder.addChildToGroup(group, icon);
         this.builder.addChildToGroup(group, iconText);
-        iconText.posX = icon.radius;
-        iconText.posY = icon.radius + iconText.height / 4;
+        iconText.cx(rad);
         return group;
     }
 
-    private createSlotValue(value?: ValueDescription): SvgGroup {
+    private createSlotValue(value?: ValueDescription): G {
         let valueSlot = this.dynamoShapeBuilder.createHexagon();
         if (value?.new) {
             valueSlot.addClass("dynamo-slot-filled-value");
@@ -224,26 +187,29 @@ export class DynamoDiagramVisualizer {
         }
 
         if (value?.text != null) {
-            let valueText = this.builder.createText(value?.text);
-            this.builder.addChildToGroup(valueSlot, valueText);
+            let valueText = this.builder.createText(value.text);
             valueText.addClass("dynamo-slot-value-text");
-            valueText.posY = 28;
-            valueText.posX = valueSlot.width / 2;
+            let metrics = this.textToSVG.getMetrics(value.text, { fontSize: 22 });
+            let minWidth = metrics.width + 34;
+            if (valueSlot.width() < minWidth) {
+                valueSlot.width(minWidth);
+            }
+            valueText.cx(valueSlot.width() / 2);
+            this.builder.addChildToGroup(valueSlot, valueText);
         }
         return valueSlot;
     }
 
-    private createValidation(name: string): SvgGroup {
+    private createValidation(name: string): G {
         let group = this.builder.createGroup();
         let slot = this.builder.createRect();
-        slot.width = 300;
-        slot.height = 40;
+        slot.width(300);
+        slot.height(40);
         slot.addClass("dynamo-validation");
 
         let slotName = this.builder.createText(name);
         slotName.addClass("dynamo-validation-name");
-        slotName.posY = 28;
-        slotName.posX = 10;
+        slotName.move(10, 28);
 
         this.builder.addChildToGroup(group, slot);
         this.builder.addChildToGroup(group, slotName);

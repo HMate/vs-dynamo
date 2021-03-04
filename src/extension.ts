@@ -28,24 +28,15 @@ export function deactivate() {}
 
 function updateViewHtml(panel: vscode.WebviewPanel, mediaUri: vscode.Uri) {
     const webviewHtmlUri = vscode.Uri.joinPath(mediaUri, "index.html");
-    const webviewJsUri = vscode.Uri.joinPath(mediaUri, "webview.js");
-    const webviewJsSrc = panel.webview.asWebviewUri(webviewJsUri);
-    const styleCssUri = vscode.Uri.joinPath(mediaUri, "webview-style.css");
-    const styleCssSrc = panel.webview.asWebviewUri(styleCssUri);
+    const mediaSrcPath = panel.webview.asWebviewUri(mediaUri);
     console.log("Generating webview vs-dynamo");
-    panel.webview.html = getWebviewContent(panel.webview, webviewHtmlUri, webviewJsSrc, styleCssSrc);
+    panel.webview.html = getWebviewContent(panel.webview, webviewHtmlUri, mediaSrcPath);
 }
 
-function getWebviewContent(
-    webview: vscode.Webview,
-    htmlPath: vscode.Uri,
-    jsPath: vscode.Uri,
-    styleCssUri: vscode.Uri
-): string {
+function getWebviewContent(webview: vscode.Webview, htmlPath: vscode.Uri, mediaUri: vscode.Uri): string {
     let contents = fs.readFileSync(htmlPath.fsPath, "utf-8");
-    contents = contents.replace(/\${webviewScriptJs}/g, jsPath.toString());
     contents = contents.replace(/\${webview.cspSource}/g, webview.cspSource);
-    contents = contents.replace(/\${styleCss}/g, styleCssUri.toString());
+    contents = contents.replace(/\${mediaUri}/g, mediaUri.toString());
     const nonce = getNonce();
     contents = contents.replace(/\${nonce}/g, nonce);
     return contents;

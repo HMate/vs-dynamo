@@ -10,7 +10,7 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 /**@type {import('webpack').Configuration}*/
 const config = {
-    target: "node",
+    target: "electron-renderer",
     mode: "none", // this leaves the source code as close as possible to the original (when packaging we set this to 'production')
 
     entry: "./src/webview/webview.ts",
@@ -19,14 +19,11 @@ const config = {
         path: path.resolve(__dirname, "..", "media"),
         filename: "webview.js",
         libraryTarget: "window",
-    },
-    devtool: "nosources-source-map",
-    externals: {
-        vscode: "commonjs vscode", // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
+        publicPath: "",
     },
     resolve: {
         // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
-        extensions: [".ts", ".js", ".html"],
+        extensions: [".ts", ".js", ".html", ".ttf"],
     },
     module: {
         rules: [
@@ -43,9 +40,25 @@ const config = {
                 test: /\.html$/,
             },
             {
+                test: /\.ttf$/,
+                use: [
+                    {
+                        loader: "file-loader",
+                        options: {
+                            name: "./font/[name].[ext]",
+                        },
+                    },
+                ],
+            },
+            {
                 test: /\.(scss|css)$/,
                 exclude: /node_modules/,
-                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    "css-loader",
+                    "resolve-url-loader",
+                    { loader: "sass-loader", options: { sourceMap: true } },
+                ],
             },
         ],
     },
