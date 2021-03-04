@@ -13,7 +13,7 @@ export function main() {
     const visualizer = new DynamoDiagramVisualizer(builder);
 
     let entity: EntityDescription = {
-        name: "SomeEnttiy",
+        name: "SomeEntity",
         slots: [
             { name: "SomeSlot", type: "slot", relation: SlotRelationship.CLONE },
             { name: "SomeOtherSlot", type: "slot", value: { text: "23" }, relation: SlotRelationship.SPECIALIZE },
