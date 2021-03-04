@@ -9,6 +9,7 @@ export function main() {
         return;
     }
     const builder = new SvgVisualizationBuilder(svgRoot);
+    builder.addCameraHandlers();
     const visualizer = new DynamoDiagramVisualizer(builder);
 
     let entity: EntityDescription = {

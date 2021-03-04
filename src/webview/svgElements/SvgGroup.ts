@@ -14,8 +14,28 @@ export class SvgGroup extends SvgVisualElement {
         this.gElem.appendChild(child.getDomElem());
     }
 
+    public removeChild(child: SvgVisualElement) {
+        this.gElem.removeChild(child.getDomElem());
+    }
+
     get children() {
         return Array.from(this.gElem.children);
+    }
+
+    public clearTransforms() {
+        this.gElem.transform.baseVal.clear();
+    }
+
+    public transform(transformation: SVGTransform) {
+        this.gElem.transform.baseVal.appendItem(transformation);
+        // if (this.gElem.transform.baseVal.numberOfItems === 0) {
+        //     this.gElem.transform.baseVal.appendItem(transformation);
+        //     return;
+        // }
+        // let tr = this.gElem.transform.baseVal.getItem(0);
+        // if (tr.type === transformation.type) {
+        //     this.gElem.transform.baseVal.replaceItem(transformation, 0);
+        // }
     }
 
     set posX(value: number) {

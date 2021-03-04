@@ -1,8 +1,8 @@
-import { getVSCodeDownloadUrl } from "vscode-test/out/util";
 import { SvgGroup } from "../svgElements/SvgGroup";
 import { SvgRect } from "../svgElements/SvgRect";
 import { SvgText } from "../svgElements/SvgText";
 import { SvgVisualizationBuilder } from "../SvgVisualizationBuilder";
+import { MouseButton } from "../utils";
 import {
     ConstraintDescription,
     EntityDescription,
@@ -14,22 +14,6 @@ import {
 import { SvgShapeBuilder } from "./ShapeBuilder";
 import "./webview-style.scss";
 
-const enum MouseButton {
-    LEFT = 0,
-    MIDDLE = 1,
-    RIGHT = 2,
-    SIDE_BACK = 3,
-    SIDE_FORWARD = 4,
-}
-
-const enum MouseButtons {
-    LEFT = 1,
-    MIDDLE = 2,
-    RIGHT = 4,
-    SIDE_BACK = 8,
-    SIDE_FORWARD = 16,
-}
-
 export class DynamoDiagramVisualizer {
     private readonly dynamoShapeBuilder: SvgShapeBuilder;
 
@@ -38,7 +22,7 @@ export class DynamoDiagramVisualizer {
     }
 
     public addEntity(desc: EntityDescription) {
-        // TODO: Expand slots/validations
+        // TODO: Expand validations
         // TODO: Zoom, pan camera
         // TODO: Resize width/height based on number of slots, slot text
         // TODO: constraints
@@ -67,7 +51,7 @@ export class DynamoDiagramVisualizer {
         this.builder.addChildToGroup(group, entity);
         this.builder.addChildToGroup(group, entityName);
 
-        this.addEntityMovementHandlers(group, entity);
+        this.addEntityMovementHandlers(group, entity, desc);
 
         this.createSlots(group, desc.slots);
         entity.height = group.height + 30;
@@ -76,12 +60,18 @@ export class DynamoDiagramVisualizer {
         return group;
     }
 
-    private addEntityMovementHandlers(group: SvgGroup, entity: SvgRect) {
+    private addEntityMovementHandlers(group: SvgGroup, entity: SvgRect, desc: EntityDescription) {
         let hasMouse = false;
         let pivot = { x: 0, y: 0 };
         entity.getDomElem().onmousedown = (e: MouseEvent) => {
             if (e.button == MouseButton.LEFT) {
                 hasMouse = true;
+                let scale = this.builder.root.getViewportScale();
+                console.log(`==========================================`);
+                console.log(`SET offset: ${e.offsetX}`);
+                console.log(`SET client: ${e.clientX}`);
+                console.log(`SET page: ${e.pageX}`);
+                console.log(`SET group.posX: ${group.posX}`);
                 pivot = { x: e.offsetX - group.posX, y: e.offsetY - group.posY };
             }
         };
@@ -92,12 +82,24 @@ export class DynamoDiagramVisualizer {
             }
         };
 
-        this.builder.root.onmousemove = (e: MouseEvent) => {
+        window.onkeydown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                hasMouse = false;
+            }
+        };
+
+        this.builder.root.addMouseMovementHandler(desc.name, (e: MouseEvent) => {
             if (hasMouse) {
+                let scale = this.builder.root.getViewportScale();
+                console.log(`...`);
+                console.log(`MOVE offset: ${e.offsetX}`);
+                console.log(`MOVE screenX: ${e.screenX}`);
+                console.log(`MOVE group.posX: ${group.posX}`);
+                console.log(`MOVE pivot.x: ${pivot.x}`);
                 group.posX = e.offsetX - pivot.x;
                 group.posY = e.offsetY - pivot.y;
             }
-        };
+        });
     }
 
     private addSlotExpansionHandlers(entityGroup: SvgGroup, entityDesc: EntityDescription) {
@@ -109,7 +111,6 @@ export class DynamoDiagramVisualizer {
                 if (rectElem == null) return;
                 rectElem.onclick = () => {
                     let nameElem = child.getElementsByClassName("dynamo-slot-name").item(0);
-                    console.log(`Cliecked {nameElem}`);
                     let name = nameElem?.textContent ?? "";
 
                     for (const slot of entityDesc.slots) {
