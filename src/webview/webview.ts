@@ -22,14 +22,35 @@ function buildVisualization(svgId: string, tts: TextToSVG) {
     let entity: EntityDescription = {
         name: "SomeEntity",
         slots: [
-            { name: "SomeSlot", type: "slot", relation: SlotRelationship.CLONE },
-            { name: "SomeOtherSlot", type: "slot", value: { text: "23" }, relation: SlotRelationship.SPECIALIZE },
+            {
+                name: "SomeSlot",
+                type: "slot",
+                relation: SlotRelationship.CLONE,
+                constraints: [
+                    { name: "$T", value: "Bool" },
+                    { name: "$C", value: "1" },
+                ],
+            },
+            {
+                name: "SomeOtherSlot",
+                type: "slot",
+                value: { text: "23" },
+                relation: SlotRelationship.SPECIALIZE,
+                constraints: [
+                    { name: "$T", value: "Number" },
+                    { name: "$C", value: "0..INF" },
+                ],
+            },
             {
                 name: "NewSlot",
                 type: "slot",
                 value: { text: "$SomeVal", new: true },
                 relation: SlotRelationship.PARTITION,
                 expanded: true,
+                constraints: [
+                    { name: "$T", value: "$SomeValType" },
+                    { name: "$C", value: "0..1" },
+                ],
             },
             { name: "NumeroTres", type: "slot", value: { text: "#3", new: true }, relation: SlotRelationship.OMIT },
             { name: "SomeOperation", type: "validation" },

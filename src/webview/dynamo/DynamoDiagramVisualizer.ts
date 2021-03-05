@@ -13,6 +13,8 @@ import {
 import { DynamoShapeBuilder } from "./ShapeBuilder";
 import TextToSVG from "../TextToSvg";
 import "./webview-style.scss";
+import DynamoHexagon from "./DynamoHexagon";
+import DynamoConstraintHolder from "./DynamoConstraintHolder";
 
 export class DynamoDiagramVisualizer {
     constructor(private readonly builder: DynamoShapeBuilder, private textToSVG: TextToSVG) {}
@@ -120,17 +122,83 @@ export class DynamoDiagramVisualizer {
         valueSlot.x(slot.width() - valueSlot.width());
 
         if (desc.expanded) {
-            let cholder = this.createSlotConstraintHolder([]);
-            cholder.move(25, slot.height());
+            let cholder = this.createSlotConstraintHolder();
             group.add(cholder);
+            cholder.cx(slot.width() / 2);
+            cholder.y(slot.height());
+
+            this.createConstraints(cholder, desc.constraints);
+            cholder.cx(slot.width() / 2);
+            cholder.y(slot.height());
+            this.calcConstraints(cholder);
+            cholder.back();
         }
         return group;
     }
 
-    private createSlotConstraintHolder(constraints: Array<ConstraintDescription>) {
+    private createSlotConstraintHolder() {
         let holder = this.builder.createConstraintHolder();
         holder.addClass("dynamo-constraint-holder");
+
         return holder;
+    }
+
+    private createConstraints(ctrHolder: DynamoConstraintHolder, ctrDescs: Array<ConstraintDescription> | undefined) {
+        if (!ctrDescs) {
+            return;
+        }
+
+        let ctrSvgs = ctrDescs.map((d) => this.createConstraint(d));
+        ctrSvgs.forEach((ctr) => ctrHolder.add(ctr));
+
+        let offsetY = 6;
+        let maxChildWidth = 0;
+        for (const ctr of ctrSvgs) {
+            offsetY += ctr.height() + 12;
+            maxChildWidth = Math.max(maxChildWidth, ctr.width());
+        }
+
+        ctrHolder.height(offsetY + 10);
+
+        let desiredMinWidth = maxChildWidth + 6;
+        if (ctrHolder.width() < desiredMinWidth) {
+            ctrHolder.width(desiredMinWidth);
+        }
+
+        // offsetY = 6;
+        // let holderHalf = ctrHolder.width() / 2;
+        // for (const ctr of ctrSvgs) {
+        //     ctr.cx(holderHalf);
+        //     ctr.y(offsetY);
+        //     offsetY += ctr.height() + 12;
+        // }
+    }
+
+    private calcConstraints(ctrHolder: DynamoConstraintHolder) {
+        let offsetY = 6;
+        let holderHalf = ctrHolder.width() / 2;
+        for (const ctr of ctrHolder.find(".dynamo-constraint")) {
+            ctr.cx(holderHalf);
+            ctr.y(offsetY);
+            offsetY += ctr.height() + 12;
+        }
+    }
+
+    private createConstraint(desc: ConstraintDescription): DynamoHexagon {
+        let shape = this.builder.createHexagon();
+        shape.addClass("dynamo-constraint");
+
+        let textContent = `${desc.name} : ${desc.value}`;
+        let text = this.builder.createText(textContent);
+        shape.add(text);
+        text.addClass("dynamo-constraint-text");
+        let metrics = this.textToSVG.getMetrics(textContent, { fontSize: 22 });
+        let minWidth = metrics.width + 34;
+        if (shape.width() < minWidth) {
+            shape.width(minWidth);
+        }
+        text.cx(shape.width() / 2);
+        return shape;
     }
 
     private createSlotIcon(relationship: SlotRelationship): G {
@@ -167,7 +235,7 @@ export class DynamoDiagramVisualizer {
         return group;
     }
 
-    private createSlotValue(value?: ValueDescription): G {
+    private createSlotValue(value?: ValueDescription): DynamoHexagon {
         let valueSlot = this.builder.createHexagon();
         if (value?.new) {
             valueSlot.addClass("dynamo-slot-filled-value");

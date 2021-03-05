@@ -21,6 +21,23 @@ export default class DynamoConstraintHolder extends G {
 
         let points = this.createConstraintHolderShape(width as number, height, this.arcRad);
         this.polygonChild = this.polygon(points.map((p) => `${p[0]},${p[1]}`).join(" "));
+        this.polygonChild.back();
+
+        return this;
+    }
+
+    public height(): number;
+    public height(height: NumberAlias): this;
+    public height(height?: NumberAlias) {
+        if (height == null) {
+            return this.polygonChild.height();
+        }
+        let width = this.polygonChild.width();
+        this.polygonChild.remove();
+
+        let points = this.createConstraintHolderShape(width, height as number, this.arcRad);
+        this.polygonChild = this.polygon(points.map((p) => `${p[0]},${p[1]}`).join(" "));
+        this.polygonChild.back();
 
         return this;
     }

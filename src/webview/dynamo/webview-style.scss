@@ -100,6 +100,18 @@ body,
     fill: $slot-color;
 }
 
+.dynamo-constraint polygon {
+    stroke-width: 2;
+    stroke: black;
+    fill: $constraint-color;
+}
+
+.dynamo-constraint-text {
+    font-family: "DynamoFont";
+    font-size: 18px;
+    text-anchor: middle;
+}
+
 .dynamo-validation {
     fill: $validation-color;
     stroke: black;

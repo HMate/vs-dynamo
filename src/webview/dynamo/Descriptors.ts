@@ -12,6 +12,7 @@ export interface ValueDescription {
 
 export interface ConstraintDescription {
     name: string;
+    value: string;
 }
 
 export interface AbstractSlotDescription {
@@ -24,6 +25,7 @@ export interface SlotDescription extends AbstractSlotDescription {
     relation: SlotRelationship;
     value?: ValueDescription;
     expanded?: boolean;
+    constraints?: Array<ConstraintDescription>;
 }
 
 export interface ValidationDescription extends AbstractSlotDescription {

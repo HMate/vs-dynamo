@@ -21,6 +21,23 @@ export default class DynamoHexagon extends G {
 
         let points = this.createHexagonShape(width as number, height, this.steep);
         this.polygonChild = this.polygon(points.map((p) => `${p[0]},${p[1]}`).join(" "));
+        this.polygonChild.back();
+
+        return this;
+    }
+
+    public height(): number;
+    public height(height: NumberAlias): this;
+    public height(height?: NumberAlias) {
+        if (height == null) {
+            return this.polygonChild.height();
+        }
+        let width = this.polygonChild.width();
+        this.polygonChild.remove();
+
+        let points = this.createHexagonShape(width, height as number, this.steep);
+        this.polygonChild = this.polygon(points.map((p) => `${p[0]},${p[1]}`).join(" "));
+        this.polygonChild.back();
 
         return this;
     }
