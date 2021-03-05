@@ -5,23 +5,18 @@ import "./font/RobotoMono.ttf";
 import { DynamoShapeBuilder } from "./dynamo/ShapeBuilder";
 
 export function main(mediaUri: string) {
-    const svgRoot = document.getElementById("dynamo-svg");
-    if (svgRoot == null) {
-        return;
-    }
-
     TextToSVG.load(`${mediaUri}/font/RobotoMono.ttf`, (err: any, tts: TextToSVG | null) => {
         if (err || tts == null) {
             console.error(`Error while loading opentype text: ${err} | ${tts}`);
             return;
         }
-        buildVisualization(svgRoot.id, tts);
+        buildVisualization("dynamo-svg", tts);
     });
 }
 
 function buildVisualization(svgId: string, tts: TextToSVG) {
     const builder = new DynamoShapeBuilder(`#${svgId}`);
-    //builder.addCameraHandlers();
+    builder.addCameraHandlers();
     const visualizer = new DynamoDiagramVisualizer(builder, tts);
 
     let entity: EntityDescription = {

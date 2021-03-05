@@ -1,15 +1,20 @@
-import { SvgVisualElement } from "./svgElements/SvgVisualElement";
-import { Point, SvgInHtml } from "./utils";
-import { SvgText } from "./svgElements/SvgText";
-import { SvgPolygon } from "./svgElements/SvgPolygon";
-import { SvgCircle } from "./svgElements/SvgCircle";
-import { Svg, SVG, Element, Rect, G, Text } from "@svgdotjs/svg.js";
-import { Circle } from "@svgdotjs/svg.js";
+import { Point } from "./utils";
+import { Svg, SVG, Element, Rect, G, Text, Circle } from "@svgdotjs/svg.js";
+import "@svgdotjs/svg.panzoom.js";
 
 export class SvgVisualizationBuilder {
     readonly root: Svg;
     constructor(rootId: string) {
-        this.root = SVG().addTo(rootId).size("100%", "100%");
+        let bodyRect = document?.getElementsByTagName("body")?.item(0)?.getBoundingClientRect();
+        let windowSize = { width: 1600, height: 1200 };
+        if (bodyRect != null) {
+            windowSize = { width: bodyRect.width, height: bodyRect.height };
+        }
+
+        this.root = SVG().addTo("body").size(windowSize.width, windowSize.height);
+        this.root.id(rootId);
+        this.root.addClass("dynamo-svg-root");
+        this.root.viewbox(0, 0, windowSize.width, windowSize.height);
     }
 
     public addChildToGroup(group: G, child: Element) {
@@ -47,15 +52,7 @@ export class SvgVisualizationBuilder {
         return this.root.polygon(points.map((p) => `${p[0]},${p[1]}`).join(" "));
     }
 
-    // public addCameraHandlers() {
-    //     // this.root.addEventListener("zoom", (event) => {
-    //     //     console.log(event.);
-    //     // });
-    //     this.root.getDomElem().onwheel = (event: WheelEvent) => {
-    //         let delta = event.deltaY; // negative: scroll up, pos: scroll down
-    //         let point = { x: event.offsetX, y: event.offsetY };
-    //         this.root.zoom(-delta / 5000, point);
-    //         console.log(`onwheel: ${this.root} ${event.deltaY}`);
-    //     };
-    // }
+    public addCameraHandlers() {
+        this.root.panZoom({ zoomMin: 0.2, zoomMax: 2, zoomFactor: 0.1 });
+    }
 }

@@ -19,7 +19,6 @@ export class DynamoDiagramVisualizer {
 
     public addEntity(desc: EntityDescription) {
         // TODO: Expand validations
-        // TODO: Zoom, pan camera
         // TODO: Resize width/height based on number of slots, slot text
         // TODO: constraints
         // TODO: Layout multiple entities
@@ -62,7 +61,6 @@ export class DynamoDiagramVisualizer {
     private addSlotExpansionHandlers(entityGroup: G, entityDesc: EntityDescription) {
         for (const child of entityGroup.children()) {
             let elems = child.find(".dynamo-slot");
-            //let elems = Array.from(child.getElementsByClassName("dynamo-slot"));
 
             if (elems.length > 0) {
                 let rectElem = child.findOne("rect") as Rect;
