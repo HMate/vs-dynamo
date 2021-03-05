@@ -1,8 +1,8 @@
 import { EntityDescription, SlotRelationship } from "./dynamo/Descriptors";
 import { DynamoDiagramVisualizer } from "./dynamo/DynamoDiagramVisualizer";
-import { SvgVisualizationBuilder } from "./SvgVisualizationBuilder";
 import TextToSVG from "./TextToSvg";
 import "./font/RobotoMono.ttf";
+import { DynamoShapeBuilder } from "./dynamo/ShapeBuilder";
 
 export function main(mediaUri: string) {
     const svgRoot = document.getElementById("dynamo-svg");
@@ -20,7 +20,7 @@ export function main(mediaUri: string) {
 }
 
 function buildVisualization(svgId: string, tts: TextToSVG) {
-    const builder = new SvgVisualizationBuilder(`#${svgId}`);
+    const builder = new DynamoShapeBuilder(`#${svgId}`);
     //builder.addCameraHandlers();
     const visualizer = new DynamoDiagramVisualizer(builder, tts);
 

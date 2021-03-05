@@ -1,48 +1,20 @@
-import { SingleEntryPlugin } from "webpack";
-import { SvgGroup } from "../svgElements/SvgGroup";
 import { SvgVisualizationBuilder } from "../SvgVisualizationBuilder";
-import { addPoint, Point } from "../utils";
-import DynamoHexagon from "./SvgHexagon";
+import DynamoConstraintHolder from "./DynamoConstraintHolder";
+import DynamoHexagon from "./DynamoHexagon";
 
-export class SvgShapeBuilder {
-    constructor(private readonly builder: SvgVisualizationBuilder) {}
+export class DynamoShapeBuilder extends SvgVisualizationBuilder {
+    constructor(rootId: string) {
+        super(rootId);
+    }
 
     public createHexagon(): DynamoHexagon {
         let hexagon = new DynamoHexagon(75, 40, 10);
-        this.builder.addChildToRoot(hexagon);
+        this.addChildToRoot(hexagon);
         return hexagon;
     }
 
-    // public createConstraintHolder(): SvgGroup {
-    //     let group = this.builder.createGroup();
-    //     let shape = this.builder.createPolygon(this.createConstraintHolderShape(250, 100, 15));
-    //     this.builder.addChildToRoot(group);
-    //     this.builder.addChildToGroup(group, shape);
-    //     return group;
-    // }
-
-    // private createConstraintHolderShape(width: number, height: number, arcRad: number): Array<Point> {
-    //     let arcGen = (rad: number, offset: Point): [number, number] => {
-    //         return addPoint([Math.cos(rad) * arcRad, -Math.sin(rad) * arcRad], offset);
-    //     };
-    //     let PIHalf = Math.PI / 2;
-    //     let points: Array<Point> = [
-    //         [0, 0],
-    //         [0, height - arcRad],
-    //         arcGen(Math.PI + PIHalf / 5, [arcRad, height - arcRad]),
-    //         arcGen(Math.PI + (2 * PIHalf) / 5, [arcRad, height - arcRad]),
-    //         arcGen(Math.PI + (3 * PIHalf) / 5, [arcRad, height - arcRad]),
-    //         arcGen(Math.PI + (4 * PIHalf) / 5, [arcRad, height - arcRad]),
-    //         [arcRad, height],
-    //         [width - arcRad, height],
-    //         arcGen((3 / 2) * Math.PI + PIHalf / 5, [width - arcRad, height - arcRad]),
-    //         arcGen((3 / 2) * Math.PI + (2 * PIHalf) / 5, [width - arcRad, height - arcRad]),
-    //         arcGen((3 / 2) * Math.PI + (3 * PIHalf) / 5, [width - arcRad, height - arcRad]),
-    //         arcGen((3 / 2) * Math.PI + (4 * PIHalf) / 5, [width - arcRad, height - arcRad]),
-    //         [width, height - arcRad],
-    //         [width, 0],
-    //     ];
-    //     console.log(points);
-    //     return points;
-    // }
+    public createConstraintHolder(): DynamoConstraintHolder {
+        let holder = new DynamoConstraintHolder(250, 100, 15);
+        return holder;
+    }
 }

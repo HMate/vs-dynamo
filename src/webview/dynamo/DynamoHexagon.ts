@@ -1,6 +1,7 @@
 import { NumberAlias } from "@svgdotjs/svg.js";
-import { G, Polygon, Container, extend as SvgExtend } from "@svgdotjs/svg.js";
+import { G, Polygon } from "@svgdotjs/svg.js";
 import { Point } from "../utils";
+
 export default class DynamoHexagon extends G {
     private polygonChild: Polygon;
     constructor(width: number, height: number, private steep: number) {
@@ -37,9 +38,3 @@ export default class DynamoHexagon extends G {
         ];
     }
 }
-
-SvgExtend(Container, {
-    hexagon: function (width: number, height: number, steep: number) {
-        return (this as Container).put(new DynamoHexagon(width, height, steep));
-    },
-});
