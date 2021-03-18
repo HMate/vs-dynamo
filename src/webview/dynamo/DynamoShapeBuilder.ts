@@ -1,9 +1,10 @@
 import { SvgVisualizationBuilder } from "../SvgVisualizationBuilder";
-import DynamoConstraintHolder from "./DynamoConstraintHolder";
+import TextToSVG from "../TextToSvg";
+import { DynamoConstraintHolder } from "./DynamoConstraintHolder";
 import DynamoHexagon from "./DynamoHexagon";
 
 export class DynamoShapeBuilder extends SvgVisualizationBuilder {
-    constructor(rootId: string) {
+    constructor(rootId: string, readonly textToSVG: TextToSVG) {
         super(rootId);
     }
 

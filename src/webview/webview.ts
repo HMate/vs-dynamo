@@ -2,7 +2,7 @@ import { EntityDescription, SlotRelationship } from "./dynamo/Descriptors";
 import { DynamoDiagramVisualizer } from "./dynamo/DynamoDiagramVisualizer";
 import TextToSVG from "./TextToSvg";
 import "./font/RobotoMono.ttf";
-import { DynamoShapeBuilder } from "./dynamo/ShapeBuilder";
+import { DynamoShapeBuilder } from "./dynamo/DynamoShapeBuilder";
 
 export function main(mediaUri: string) {
     TextToSVG.load(`${mediaUri}/font/RobotoMono.ttf`, (err: any, tts: TextToSVG | null) => {
@@ -15,9 +15,9 @@ export function main(mediaUri: string) {
 }
 
 function buildVisualization(svgId: string, tts: TextToSVG) {
-    const builder = new DynamoShapeBuilder(`#${svgId}`);
+    const builder = new DynamoShapeBuilder(`#${svgId}`, tts);
     builder.addCameraHandlers();
-    const visualizer = new DynamoDiagramVisualizer(builder, tts);
+    const visualizer = new DynamoDiagramVisualizer(builder);
 
     let entity: EntityDescription = {
         name: "SomeEntity",
