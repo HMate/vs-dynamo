@@ -124,13 +124,10 @@ export class DynamoDiagramVisualizer {
         if (desc.expanded) {
             let cholder = this.createSlotConstraintHolder();
             group.add(cholder);
-            cholder.cx(slot.width() / 2);
-            cholder.y(slot.height());
 
             this.createConstraints(cholder, desc.constraints);
             cholder.cx(slot.width() / 2);
             cholder.y(slot.height());
-            this.calcConstraints(cholder);
             cholder.back();
         }
         return group;
@@ -160,23 +157,13 @@ export class DynamoDiagramVisualizer {
 
         ctrHolder.height(offsetY + 10);
 
-        let desiredMinWidth = maxChildWidth + 6;
+        let desiredMinWidth = maxChildWidth + 20;
         if (ctrHolder.width() < desiredMinWidth) {
             ctrHolder.width(desiredMinWidth);
         }
 
-        // offsetY = 6;
-        // let holderHalf = ctrHolder.width() / 2;
-        // for (const ctr of ctrSvgs) {
-        //     ctr.cx(holderHalf);
-        //     ctr.y(offsetY);
-        //     offsetY += ctr.height() + 12;
-        // }
-    }
-
-    private calcConstraints(ctrHolder: DynamoConstraintHolder) {
-        let offsetY = 6;
-        let holderHalf = ctrHolder.width() / 2;
+        offsetY = ctrHolder.y() + 12;
+        let holderHalf = ctrHolder.x() + ctrHolder.width() / 2;
         for (const ctr of ctrHolder.find(".dynamo-constraint")) {
             ctr.cx(holderHalf);
             ctr.y(offsetY);

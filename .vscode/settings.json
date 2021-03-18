@@ -10,5 +10,6 @@
     "typescript.tsc.autoDetect": "off",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.rulers": [120],
-    "typescript.tsdk": "node_modules\\typescript\\lib"
+    "typescript.tsdk": "node_modules\\typescript\\lib",
+    "explorer.autoReveal": false
 }

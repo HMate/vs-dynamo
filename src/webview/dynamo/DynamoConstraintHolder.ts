@@ -1,5 +1,4 @@
-import { NumberAlias } from "@svgdotjs/svg.js";
-import { G, Polygon } from "@svgdotjs/svg.js";
+import { Box, G, Polygon, NumberAlias } from "@svgdotjs/svg.js";
 import { addPoint, Point } from "../utils";
 
 export default class DynamoConstraintHolder extends G {
@@ -8,6 +7,10 @@ export default class DynamoConstraintHolder extends G {
         super();
         let points = this.createConstraintHolderShape(width, height, arcRad);
         this.polygonChild = this.polygon(points.map((p) => `${p[0]},${p[1]}`).join(" "));
+    }
+
+    public bbox(): Box {
+        return this.polygonChild.bbox();
     }
 
     public width(): number;
