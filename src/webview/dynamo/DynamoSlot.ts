@@ -1,9 +1,10 @@
 import { G, Rect, Text } from "@svgdotjs/svg.js";
 import { ConstraintDescription, SlotDescription, SlotRelationship } from "./Descriptors";
 import { DynamoShapeBuilder } from "./DynamoShapeBuilder";
-import { DynamoConstraintHolder } from "./DynamoConstraintHolder";
+import { DynamoConstraintHolderShape } from "./DynamoConstraintHolderShape";
 import { DynamoConstraint } from "./DynamoConstraint";
 import { DynamoValue } from "./DynamoValue";
+import { DynamoConstraintHolder } from "./DynamoConstraintHolder";
 
 export class DynamoSlot {
     static readonly slotHeight = 40;
@@ -60,13 +61,11 @@ export class DynamoSlot {
         }
 
         if (this.desc.expanded) {
-            this.constraintHolder = this.createSlotConstraintHolder();
-            this.root.add(this.constraintHolder);
-
-            this.createConstraints(this.constraintHolder, this.desc.constraints);
-            this.constraintHolder.cx(this.shapeHolder.width() / 2);
-            this.constraintHolder.y(this.shapeHolder.height());
-            // this.constraintHolder.back();
+            this.constraintHolder = new DynamoConstraintHolder(this.builder, this.desc.constraints);
+            let constraintRoot = this.constraintHolder.getRoot();
+            if (constraintRoot != null) {
+                this.root.add(constraintRoot);
+            }
         }
 
         let minWidth = this.getMinWidth();
@@ -89,8 +88,12 @@ export class DynamoSlot {
             }
         }
         if (this.constraintHolder != null) {
-            this.constraintHolder.cx(this.shapeHolder.width() / 2);
-            this.constraintHolder.y(this.shapeHolder.y() + this.shapeHolder.height());
+            let constraintRoot = this.constraintHolder.getRoot();
+            if (constraintRoot != null) {
+                this.constraintHolder.resizeWidth(this.shapeHolder.width() - 20);
+                constraintRoot.cx(this.shapeHolder.width() / 2);
+                constraintRoot.y(this.shapeHolder.y() + this.shapeHolder.height());
+            }
         }
     }
 
@@ -133,40 +136,5 @@ export class DynamoSlot {
         holder.addClass("dynamo-constraint-holder");
 
         return holder;
-    }
-
-    private createConstraints(ctrHolder: DynamoConstraintHolder, ctrDescs: Array<ConstraintDescription> | undefined) {
-        if (!ctrDescs) {
-            return;
-        }
-
-        let ctrElems = ctrDescs.map((d) => new DynamoConstraint(this.builder, d));
-
-        let offsetY = 6;
-        let maxChildWidth = 0;
-        for (const ctr of ctrElems) {
-            let root = ctr.getRoot();
-            if (root == null) {
-                continue;
-            }
-            ctrHolder.add(root);
-            offsetY += root.height() + 12;
-            maxChildWidth = Math.max(maxChildWidth, root.width());
-        }
-
-        ctrHolder.height(offsetY + 10);
-
-        let desiredMinWidth = maxChildWidth + 20;
-        if (ctrHolder.width() < desiredMinWidth) {
-            ctrHolder.width(desiredMinWidth);
-        }
-
-        offsetY = ctrHolder.y() + 12;
-        let holderHalf = ctrHolder.x() + ctrHolder.width() / 2;
-        for (const ctr of ctrHolder.find(".dynamo-constraint")) {
-            ctr.cx(holderHalf);
-            ctr.y(offsetY);
-            offsetY += ctr.height() + 12;
-        }
     }
 }

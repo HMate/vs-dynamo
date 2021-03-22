@@ -42,7 +42,7 @@ function buildVisualization(svgId: string, tts: TextToSVG) {
                 ],
             },
             {
-                name: "NewSlotWithAKindaLongName",
+                name: "NewSlotWithAKind",
                 type: "slot",
                 value: { text: "$SomeVal", new: true },
                 relation: SlotRelationship.PARTITION,

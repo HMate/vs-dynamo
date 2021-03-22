@@ -1,6 +1,6 @@
 import { SvgVisualizationBuilder } from "../SvgVisualizationBuilder";
 import TextToSVG from "../TextToSvg";
-import { DynamoConstraintHolder } from "./DynamoConstraintHolder";
+import { DynamoConstraintHolderShape } from "./DynamoConstraintHolderShape";
 import DynamoHexagon from "./DynamoHexagon";
 
 export class DynamoShapeBuilder extends SvgVisualizationBuilder {
@@ -14,8 +14,8 @@ export class DynamoShapeBuilder extends SvgVisualizationBuilder {
         return hexagon;
     }
 
-    public createConstraintHolder(): DynamoConstraintHolder {
-        let holder = new DynamoConstraintHolder(250, 100, 15);
+    public createConstraintHolder(): DynamoConstraintHolderShape {
+        let holder = new DynamoConstraintHolderShape(250, 100, 15);
         return holder;
     }
 }

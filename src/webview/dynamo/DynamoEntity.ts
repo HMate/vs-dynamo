@@ -91,9 +91,7 @@ export class DynamoEntity {
             let elem = slot.getRoot();
             if (elem == null) continue;
             let slotWidth = slot.getMinWidth();
-            if (slotWidth > minWidth) {
-                minWidth = slotWidth;
-            }
+            minWidth = Math.max(minWidth, slotWidth);
             elem.y(currentPosY);
             entityGroup.add(elem);
             currentPosY += elem.height();
