@@ -5,6 +5,11 @@ import { DynamoSlot } from "./DynamoSlot";
 import { DynamoValidation } from "./DynamoValidation";
 
 export class DynamoEntity {
+    static readonly defaultMinWidth = 300;
+    static readonly defaultHeight = 300;
+    static readonly nameBoxHeight = 50;
+    static readonly nameMarginTop = 10;
+
     private root: G | undefined;
     private shapeHolder: Rect | undefined;
     private nameHolder: Text | undefined;
@@ -15,14 +20,13 @@ export class DynamoEntity {
     public render() {
         this.root = this.builder.createGroup();
         this.shapeHolder = this.builder.createRect();
-        this.shapeHolder.width(300);
-        this.shapeHolder.height(300);
+        this.shapeHolder.width(DynamoEntity.defaultMinWidth);
+        this.shapeHolder.height(DynamoEntity.defaultHeight);
         this.shapeHolder.radius(15);
         this.shapeHolder.addClass("dynamo-entity");
 
         this.nameHolder = this.builder.createText(this.desc.name);
         this.nameHolder.addClass("dynamo-entity-name");
-        this.nameHolder.center(this.shapeHolder.width() / 2, 10);
 
         this.builder.addChildToRoot(this.root);
         this.root.add(this.shapeHolder);
@@ -30,8 +34,10 @@ export class DynamoEntity {
 
         this.addEntityMovementHandlers(this.root);
 
-        this.createSlots(this.root, this.desc.slots);
+        let minWidth = this.createSlots(this.root, this.desc.slots);
         this.shapeHolder.height(this.root.height() + 30);
+        this.shapeHolder.width(minWidth);
+        this.nameHolder.center(this.shapeHolder.width() / 2, DynamoEntity.nameMarginTop);
 
         this.addSlotExpansionHandlers(this.root, this.desc);
         return this;
@@ -70,20 +76,32 @@ export class DynamoEntity {
     }
 
     private createSlots(entityGroup: G, slots: SlotList) {
-        let currentPosY = 50; // starting from bottom of entity name label
+        let currentPosY = DynamoEntity.nameBoxHeight; // starting from bottom of entity name label
+        let minWidth = DynamoEntity.defaultMinWidth;
+        let slotElems = new Array<DynamoSlot | DynamoValidation>();
         for (const desc of slots) {
-            let elem: G | undefined;
+            let slot: DynamoSlot | DynamoValidation;
             if (desc.type === "slot") {
-                let slot = new DynamoSlot(this.builder, desc);
-                elem = slot.getRoot();
+                slot = new DynamoSlot(this.builder, desc);
             } else {
-                let slot = new DynamoValidation(this.builder, desc);
-                elem = slot.getRoot();
+                slot = new DynamoValidation(this.builder, desc);
             }
+            slotElems.push(slot);
+
+            let elem = slot.getRoot();
             if (elem == null) continue;
+            let slotWidth = slot.getMinWidth();
+            if (slotWidth > minWidth) {
+                minWidth = slotWidth;
+            }
             elem.y(currentPosY);
             entityGroup.add(elem);
             currentPosY += elem.height();
         }
+
+        for (let slot of slotElems) {
+            slot.resizeWidth(minWidth);
+        }
+        return minWidth;
     }
 }

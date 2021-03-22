@@ -15,7 +15,6 @@ export class DynamoDiagramVisualizer {
         // TODO: Layout multiple entities
         // TODO: Entity inheritance arrows
         // TODO: Entity containment arrows
-        // NOTE for coordinates: origin is in left-bottom
 
         let entity = new DynamoEntity(this.builder, desc);
     }

@@ -6,9 +6,17 @@ import { DynamoConstraint } from "./DynamoConstraint";
 import { DynamoValue } from "./DynamoValue";
 
 export class DynamoSlot {
+    static readonly slotHeight = 40;
+    static readonly defaultMinWidth = 300;
+    static readonly nameMarginLeft = 10;
+    static readonly nameMarginRight = 10;
+    static readonly slotIconRad = 20;
+
     private root: G | undefined;
     private shapeHolder: Rect | undefined;
     private nameHolder: Text | undefined;
+    private valueSlot: DynamoValue | undefined;
+    private constraintHolder: DynamoConstraintHolder | undefined;
     constructor(private readonly builder: DynamoShapeBuilder, private readonly desc: SlotDescription) {
         this.render();
     }
@@ -17,13 +25,22 @@ export class DynamoSlot {
         return this.root;
     }
 
+    public getMinWidth(): number {
+        let nameMetric = this.builder.textToSVG.getMetrics(this.desc.name, { fontSize: 22 });
+        let minWidth =
+            2 * DynamoSlot.slotIconRad + DynamoSlot.nameMarginLeft + nameMetric.width + DynamoSlot.nameMarginRight;
+        minWidth += this.valueSlot?.getRoot()?.width() ?? 0;
+        return minWidth;
+    }
+
     public render() {
         this.root = this.builder.createGroup();
         this.shapeHolder = this.builder.createRect();
         this.root.add(this.shapeHolder);
-        this.shapeHolder.width(300);
-        this.shapeHolder.height(40);
+        this.shapeHolder.width(DynamoSlot.defaultMinWidth);
+        this.shapeHolder.height(DynamoSlot.slotHeight);
         this.shapeHolder.addClass("dynamo-slot");
+        this.shapeHolder.y(0);
 
         let icon = this.createSlotIcon(this.desc.relation);
         this.root.add(icon);
@@ -31,11 +48,11 @@ export class DynamoSlot {
         this.nameHolder = this.builder.createText(this.desc.name);
         this.root.add(this.nameHolder);
         this.nameHolder.addClass("dynamo-slot-name");
-        this.nameHolder.x(10 + icon.width());
+        this.nameHolder.x(DynamoSlot.nameMarginLeft + icon.width());
 
         if (this.desc.value != null) {
-            let valueSlot = new DynamoValue(this.builder, this.desc.value);
-            let valueRoot = valueSlot.getRoot();
+            this.valueSlot = new DynamoValue(this.builder, this.desc.value);
+            let valueRoot = this.valueSlot.getRoot();
             if (valueRoot != null) {
                 this.root.add(valueRoot);
                 valueRoot.x(this.shapeHolder.width() - valueRoot.width());
@@ -43,22 +60,45 @@ export class DynamoSlot {
         }
 
         if (this.desc.expanded) {
-            let cholder = this.createSlotConstraintHolder();
+            this.constraintHolder = this.createSlotConstraintHolder();
+            this.root.add(this.constraintHolder);
 
-            this.createConstraints(cholder, this.desc.constraints);
-            cholder.cx(this.shapeHolder.width() / 2);
-            cholder.y(this.shapeHolder.height());
-            this.root.add(cholder);
-            cholder.back();
+            this.createConstraints(this.constraintHolder, this.desc.constraints);
+            this.constraintHolder.cx(this.shapeHolder.width() / 2);
+            this.constraintHolder.y(this.shapeHolder.height());
+            // this.constraintHolder.back();
         }
+
+        let minWidth = this.getMinWidth();
+        if (minWidth > DynamoSlot.defaultMinWidth) {
+            this.resizeWidth(minWidth);
+        }
+
         return this.root;
+    }
+
+    public resizeWidth(newWidth: number) {
+        if (this.shapeHolder == null) {
+            return;
+        }
+        this.shapeHolder.width(newWidth);
+        if (this.valueSlot != null) {
+            let valueRoot = this.valueSlot.getRoot();
+            if (valueRoot != null) {
+                valueRoot.x(this.shapeHolder.width() - valueRoot.width());
+            }
+        }
+        if (this.constraintHolder != null) {
+            this.constraintHolder.cx(this.shapeHolder.width() / 2);
+            this.constraintHolder.y(this.shapeHolder.y() + this.shapeHolder.height());
+        }
     }
 
     private createSlotIcon(relationship: SlotRelationship): G {
         let group = this.builder.createGroup();
         group.addClass("dynamo-slot-icon");
         let icon = this.builder.createCircle();
-        let rad = 20;
+        let rad = DynamoSlot.slotIconRad;
         icon.radius(rad);
         icon.center(rad, rad);
         let iconText: Text;

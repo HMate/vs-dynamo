@@ -16,7 +16,6 @@ export class DynamoShapeBuilder extends SvgVisualizationBuilder {
 
     public createConstraintHolder(): DynamoConstraintHolder {
         let holder = new DynamoConstraintHolder(250, 100, 15);
-        this.addChildToRoot(holder);
         return holder;
     }
 }
