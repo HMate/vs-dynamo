@@ -22,9 +22,13 @@ export class DynamoValue {
         }
 
         if (this.desc?.text != null) {
-            this.nameHolder = this.builder.createText(this.desc.text);
+            let visibleText = this.desc.text;
+            if (visibleText.includes("\n")) {
+                visibleText = visibleText.substring(0, visibleText.indexOf("\n"));
+            }
+            this.nameHolder = this.builder.createText(visibleText);
             this.nameHolder.addClass("dynamo-slot-value-text");
-            let metrics = this.builder.textToSVG.getMetrics(this.desc.text, { fontSize: 22 });
+            let metrics = this.builder.textToSVG.getMetrics(visibleText, { fontSize: 22 });
             let minWidth = metrics.width + 34;
             if (this.root.width() < minWidth) {
                 this.root.width(minWidth);

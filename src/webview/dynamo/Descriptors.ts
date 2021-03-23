@@ -18,18 +18,20 @@ export interface ConstraintDescription {
 export interface AbstractSlotDescription {
     name: string;
     type: "slot" | "validation";
+    expanded?: boolean;
 }
 
 export interface SlotDescription extends AbstractSlotDescription {
     type: "slot";
     relation: SlotRelationship;
+    parentSlot: string;
     value?: ValueDescription;
-    expanded?: boolean;
     constraints?: Array<ConstraintDescription>;
 }
 
 export interface ValidationDescription extends AbstractSlotDescription {
     type: "validation";
+    validationType: string;
     value?: ValueDescription;
 }
 
@@ -37,5 +39,10 @@ export type SlotList = Array<SlotDescription | ValidationDescription>;
 
 export interface EntityDescription {
     name: string;
+    parent?: string;
     slots: SlotList;
+}
+
+export interface DiagramDescription {
+    entities: Array<EntityDescription>;
 }

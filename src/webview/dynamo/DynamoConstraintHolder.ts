@@ -4,6 +4,8 @@ import { DynamoConstraintHolderShape } from "./DynamoConstraintHolderShape";
 import { DynamoShapeBuilder } from "./DynamoShapeBuilder";
 
 export class DynamoConstraintHolder {
+    static readonly minTotalSideMargin = 20;
+
     private constraintHolder: DynamoConstraintHolderShape | undefined;
     private minWidth: number = 0;
     constructor(
@@ -47,10 +49,12 @@ export class DynamoConstraintHolder {
     }
 
     private createConstraints(
-        ctrHolder: DynamoConstraintHolderShape,
+        constraintHolder: DynamoConstraintHolderShape,
         ctrDescs: Array<ConstraintDescription> | undefined
     ) {
         if (!ctrDescs) {
+            console.log(`Slot Height default: ${16}`);
+            constraintHolder.height(16);
             return;
         }
 
@@ -63,16 +67,17 @@ export class DynamoConstraintHolder {
             if (root == null) {
                 continue;
             }
-            ctrHolder.add(root);
+            constraintHolder.add(root);
             offsetY += root.height() + 12;
             maxChildWidth = Math.max(maxChildWidth, root.width());
         }
 
-        ctrHolder.height(offsetY + 10);
+        constraintHolder.height(offsetY + 10);
 
-        this.minWidth = maxChildWidth + 20;
-        if (ctrHolder.width() < this.minWidth) {
-            ctrHolder.width(this.minWidth);
+        this.minWidth = maxChildWidth + DynamoConstraintHolder.minTotalSideMargin;
+        if (constraintHolder.width() < this.minWidth) {
+            constraintHolder.width(this.minWidth);
         }
+        console.log(`Slot Height: ${offsetY + 10}`);
     }
 }

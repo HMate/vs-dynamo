@@ -31,6 +31,13 @@ export class DynamoSlot {
         let minWidth =
             2 * DynamoSlot.slotIconRad + DynamoSlot.nameMarginLeft + nameMetric.width + DynamoSlot.nameMarginRight;
         minWidth += this.valueSlot?.getRoot()?.width() ?? 0;
+        let constraints = this.constraintHolder?.getRoot();
+        if (constraints != null) {
+            let constraintWidth = constraints.width() + DynamoConstraintHolder.minTotalSideMargin;
+            if (constraintWidth > minWidth) {
+                return constraintWidth;
+            }
+        }
         return minWidth;
     }
 

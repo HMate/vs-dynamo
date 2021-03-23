@@ -6,7 +6,7 @@ import { DynamoValidation } from "./DynamoValidation";
 
 export class DynamoEntity {
     static readonly defaultMinWidth = 300;
-    static readonly defaultHeight = 300;
+    static readonly defaultHeight = 60;
     static readonly nameBoxHeight = 50;
     static readonly nameMarginTop = 10;
 
@@ -15,6 +15,10 @@ export class DynamoEntity {
     private nameHolder: Text | undefined;
     constructor(private readonly builder: DynamoShapeBuilder, private readonly desc: EntityDescription) {
         this.render();
+    }
+
+    public getRoot() {
+        return this.root;
     }
 
     public render() {
@@ -76,7 +80,6 @@ export class DynamoEntity {
     }
 
     private createSlots(entityGroup: G, slots: SlotList) {
-        let currentPosY = DynamoEntity.nameBoxHeight; // starting from bottom of entity name label
         let minWidth = DynamoEntity.defaultMinWidth;
         let slotElems = new Array<DynamoSlot | DynamoValidation>();
         for (const desc of slots) {
@@ -90,15 +93,18 @@ export class DynamoEntity {
 
             let elem = slot.getRoot();
             if (elem == null) continue;
+            entityGroup.add(elem);
             let slotWidth = slot.getMinWidth();
             minWidth = Math.max(minWidth, slotWidth);
-            elem.y(currentPosY);
-            entityGroup.add(elem);
-            currentPosY += elem.height();
         }
 
+        let currentPosY = DynamoEntity.nameBoxHeight; // starting from bottom of entity name label
         for (let slot of slotElems) {
             slot.resizeWidth(minWidth);
+            let elem = slot.getRoot();
+            if (elem == null) continue;
+            elem.y(currentPosY);
+            currentPosY += elem.height();
         }
         return minWidth;
     }
