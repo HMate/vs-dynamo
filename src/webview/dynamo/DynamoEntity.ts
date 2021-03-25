@@ -1,3 +1,4 @@
+import "@svgdotjs/svg.draggable.js";
 import { G, Rect, Text } from "@svgdotjs/svg.js";
 import { EntityDescription, SlotList } from "./Descriptors";
 import { DynamoShapeBuilder } from "./DynamoShapeBuilder";
@@ -13,7 +14,7 @@ export class DynamoEntity {
     private root: G | undefined;
     private shapeHolder: Rect | undefined;
     private nameHolder: Text | undefined;
-    constructor(private readonly builder: DynamoShapeBuilder, private readonly desc: EntityDescription) {
+    constructor(private readonly builder: DynamoShapeBuilder, public readonly desc: EntityDescription) {
         this.render();
     }
 

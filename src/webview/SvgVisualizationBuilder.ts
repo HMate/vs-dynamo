@@ -29,6 +29,10 @@ export class SvgVisualizationBuilder {
         this.root.removeElement(child);
     }
 
+    public getDefs() {
+        return this.root.defs();
+    }
+
     public createRect(): Rect {
         return this.root.rect();
     }

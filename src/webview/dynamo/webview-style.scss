@@ -28,6 +28,11 @@ body,
     background-color: whitesmoke;
 }
 
+.dynamo-inherit-arrow {
+    stroke: black;
+    stroke-width: 3;
+}
+
 .dynamo-entity {
     fill: $entity-color;
     stroke: black;

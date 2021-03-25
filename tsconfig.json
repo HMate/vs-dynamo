@@ -2,9 +2,9 @@
     "compilerOptions": {
         "module": "commonjs",
         "moduleResolution": "node",
-        "target": "es6",
+        "target": "es2017",
         "outDir": "out",
-        "lib": ["es6", "DOM"],
+        "lib": ["es2017", "DOM"],
         "sourceMap": true,
         "rootDir": "src",
         "strict": true /* enable all strict type-checking options */,
