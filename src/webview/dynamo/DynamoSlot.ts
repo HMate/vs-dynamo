@@ -137,11 +137,4 @@ export class DynamoSlot {
         iconText.cx(rad);
         return group;
     }
-
-    private createSlotConstraintHolder() {
-        let holder = this.builder.createConstraintHolder();
-        holder.addClass("dynamo-constraint-holder");
-
-        return holder;
-    }
 }

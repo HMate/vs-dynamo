@@ -1,5 +1,6 @@
 import "@svgdotjs/svg.draggable.js";
 import { G, Rect, Text } from "@svgdotjs/svg.js";
+import { Coord } from "../utils";
 import { EntityDescription, SlotList } from "./Descriptors";
 import { DynamoShapeBuilder } from "./DynamoShapeBuilder";
 import { DynamoSlot } from "./DynamoSlot";
@@ -11,10 +12,11 @@ export class DynamoEntity {
     static readonly nameBoxHeight = 50;
     static readonly nameMarginTop = 10;
 
-    private root: G | undefined;
+    private root: G;
     private shapeHolder: Rect | undefined;
     private nameHolder: Text | undefined;
     constructor(private readonly builder: DynamoShapeBuilder, public readonly desc: EntityDescription) {
+        this.root = this.builder.createGroup();
         this.render();
     }
 
@@ -22,8 +24,17 @@ export class DynamoEntity {
         return this.root;
     }
 
+    public getBottomCenter(): Coord {
+        let bb = this.root.bbox();
+        return { x: bb.cx, y: bb.y2 };
+    }
+
+    public getTopCenter(): Coord {
+        let bb = this.root.bbox();
+        return { x: bb.cx, y: bb.y };
+    }
+
     public render() {
-        this.root = this.builder.createGroup();
         this.shapeHolder = this.builder.createRect();
         this.shapeHolder.width(DynamoEntity.defaultMinWidth);
         this.shapeHolder.height(DynamoEntity.defaultHeight);
@@ -69,6 +80,7 @@ export class DynamoEntity {
                         }
                     }
 
+                    // TODO: Rerender current entity instead of creating new, because now arrows loose their target
                     let entity = new DynamoEntity(this.builder, entityDesc);
                     if (entity.root != null) {
                         entity.root.move(entityGroup.x(), entityGroup.y());
