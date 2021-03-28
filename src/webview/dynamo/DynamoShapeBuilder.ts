@@ -10,7 +10,6 @@ export class DynamoShapeBuilder extends SvgVisualizationBuilder {
 
     public createHexagon(): DynamoHexagon {
         let hexagon = new DynamoHexagon(75, 40, 10);
-        this.addChildToRoot(hexagon);
         return hexagon;
     }
 

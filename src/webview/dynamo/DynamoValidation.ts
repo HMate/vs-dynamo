@@ -1,4 +1,4 @@
-import { G, Text, Rect } from "@svgdotjs/svg.js";
+import { Container, Text, Rect } from "@svgdotjs/svg.js";
 import { ValidationDescription } from "./Descriptors";
 import { DynamoShapeBuilder } from "./DynamoShapeBuilder";
 
@@ -8,7 +8,7 @@ export class DynamoValidation {
     static readonly nameMarginLeft = 10;
     static readonly nameMarginRight = 10;
 
-    private root: G | undefined;
+    private root: Container | undefined;
     private shapeHolder: Rect | undefined;
     private nameHolder: Text | undefined;
     constructor(private readonly builder: DynamoShapeBuilder, private readonly desc: ValidationDescription) {
@@ -42,6 +42,10 @@ export class DynamoValidation {
         this.shapeHolder = shape;
         this.nameHolder = name;
 
+        return this;
+    }
+
+    public update() {
         return this;
     }
 

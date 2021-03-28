@@ -11,7 +11,7 @@ export class DynamoArrow {
     constructor(private readonly builder: DynamoShapeBuilder, private start: DynamoEntity, private end: DynamoEntity) {
         this.registerDef();
         this.path = this.builder.root.path();
-        this.init().render();
+        this.render().update();
         this.addMovementHandlers();
     }
 
@@ -20,13 +20,17 @@ export class DynamoArrow {
     }
 
     private registerDef() {
-        let defs = this.builder.getDefs();
-        this.head = defs.marker(DynamoArrow.headLength, DynamoArrow.headWidth, function (head) {
-            head.polygon(`0,0 ${DynamoArrow.headLength},${DynamoArrow.headWidth / 2} 0,${DynamoArrow.headWidth}`);
-        });
+        this.head = this.builder.registerDef(
+            "dynamoInheritance",
+            DynamoArrow.headLength,
+            DynamoArrow.headWidth,
+            function (head) {
+                head.polygon(`0,0 ${DynamoArrow.headLength},${DynamoArrow.headWidth / 2} 0,${DynamoArrow.headWidth}`);
+            }
+        );
     }
 
-    public init() {
+    private render() {
         this.path.addClass("dynamo-inherit-arrow");
         if (this.head != null) {
             this.path.marker("end", this.head);
@@ -34,7 +38,7 @@ export class DynamoArrow {
         return this;
     }
 
-    public render() {
+    public update() {
         let startCoord = this.start.getBottomCenter();
         let endCoord = this.end.getTopCenter();
         let endDirection = direction(startCoord, endCoord);
@@ -49,7 +53,7 @@ export class DynamoArrow {
 
     private addMovementHandlers() {
         let cb = (_event: MouseEvent) => {
-            this.render();
+            this.update();
         };
         this.start.getRoot().on("dragmove.namespace", cb);
         this.end.getRoot().on("dragmove.namespace", cb);

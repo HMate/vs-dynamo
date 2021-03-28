@@ -1,8 +1,9 @@
 import { NumberAlias } from "@svgdotjs/svg.js";
-import { G, Polygon } from "@svgdotjs/svg.js";
+import { Svg, Polygon } from "@svgdotjs/svg.js";
 import { Point } from "../utils";
+import DynamoContainer from "./DynamoContainer";
 
-export default class DynamoHexagon extends G {
+export default class DynamoHexagon extends DynamoContainer {
     private polygonChild: Polygon;
     constructor(width: number, height: number, private steep: number) {
         super();

@@ -5,25 +5,60 @@ import { DynamoShapeBuilder } from "./DynamoShapeBuilder";
 
 export class DynamoConstraintHolder {
     static readonly minTotalSideMargin = 20;
+    static readonly constraintsMaringTop = 12;
+    static readonly constraintsMaringBetween = 12;
 
-    private constraintHolder: DynamoConstraintHolderShape | undefined;
+    private constraintHolder: DynamoConstraintHolderShape;
     private minWidth: number = 0;
+    private constraintElems: Array<DynamoConstraint> = [];
     constructor(
         private readonly builder: DynamoShapeBuilder,
         private readonly desc: Array<ConstraintDescription> | undefined
     ) {
-        this.render();
+        this.constraintHolder = this.createShape();
+        this.render().update();
     }
 
     public getRoot() {
         return this.constraintHolder;
     }
 
-    public render() {
-        this.constraintHolder = this.createShape();
-        this.createConstraints(this.constraintHolder, this.desc);
+    public visible(on: boolean | undefined) {
+        if (!!on) {
+            this.constraintHolder?.show();
+            this.update();
+        } else {
+            this.constraintHolder?.hide();
+        }
+    }
 
-        return this.constraintHolder;
+    public render() {
+        this.createConstraints(this.desc);
+        return this;
+    }
+
+    public update() {
+        if (this.constraintElems.length == 0) {
+            console.log(`Slot Height default: ${16}`);
+            this.constraintHolder.height(16);
+            return;
+        }
+
+        let offsetY = 6;
+        let maxChildWidth = 0;
+        for (const ctr of this.constraintElems) {
+            let root = ctr.getRoot();
+            offsetY += root.height() + 12;
+            maxChildWidth = Math.max(maxChildWidth, root.width());
+        }
+
+        this.constraintHolder.height(offsetY + 10);
+
+        this.minWidth = maxChildWidth + DynamoConstraintHolder.minTotalSideMargin;
+        if (this.constraintHolder.width() < this.minWidth) {
+            this.constraintHolder.width(this.minWidth);
+        }
+        return this;
     }
 
     public resizeWidth(newWidth: number) {
@@ -31,12 +66,12 @@ export class DynamoConstraintHolder {
         if (this.constraintHolder != null) {
             this.constraintHolder.width(actualWidth);
 
-            let offsetY = this.constraintHolder.y() + 12;
-            let holderHalf = this.constraintHolder.x() + this.constraintHolder.width() / 2;
+            let offsetY = DynamoConstraintHolder.constraintsMaringTop;
+            let holderHalf = this.constraintHolder.width() / 2;
             for (const ctr of this.constraintHolder.find(".dynamo-constraint")) {
                 ctr.cx(holderHalf);
                 ctr.y(offsetY);
-                offsetY += ctr.height() + 12;
+                offsetY += ctr.height() + DynamoConstraintHolder.constraintsMaringBetween;
             }
         }
     }
@@ -48,36 +83,17 @@ export class DynamoConstraintHolder {
         return holder;
     }
 
-    private createConstraints(
-        constraintHolder: DynamoConstraintHolderShape,
-        ctrDescs: Array<ConstraintDescription> | undefined
-    ) {
+    private createConstraints(ctrDescs: Array<ConstraintDescription> | undefined) {
         if (!ctrDescs) {
             console.log(`Slot Height default: ${16}`);
-            constraintHolder.height(16);
+            this.constraintHolder.height(16);
             return;
         }
 
-        let ctrElems = ctrDescs.map((d) => new DynamoConstraint(this.builder, d));
-
-        let offsetY = 6;
-        let maxChildWidth = 0;
-        for (const ctr of ctrElems) {
+        this.constraintElems = ctrDescs.map((d) => new DynamoConstraint(this.builder, d));
+        for (const ctr of this.constraintElems) {
             let root = ctr.getRoot();
-            if (root == null) {
-                continue;
-            }
-            constraintHolder.add(root);
-            offsetY += root.height() + 12;
-            maxChildWidth = Math.max(maxChildWidth, root.width());
+            this.constraintHolder.add(root);
         }
-
-        constraintHolder.height(offsetY + 10);
-
-        this.minWidth = maxChildWidth + DynamoConstraintHolder.minTotalSideMargin;
-        if (constraintHolder.width() < this.minWidth) {
-            constraintHolder.width(this.minWidth);
-        }
-        console.log(`Slot Height: ${offsetY + 10}`);
     }
 }

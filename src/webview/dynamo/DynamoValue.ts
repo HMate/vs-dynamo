@@ -1,11 +1,15 @@
+import { Container } from "@svgdotjs/svg.js";
 import { G, Text } from "@svgdotjs/svg.js";
 import { ValueDescription } from "./Descriptors";
 import { DynamoShapeBuilder } from "./DynamoShapeBuilder";
 
 export class DynamoValue {
-    private root: G | undefined;
+    private static readonly emptyTextWidth = 34;
+
+    private root: Container;
     private nameHolder: Text | undefined;
     constructor(private readonly builder: DynamoShapeBuilder, private readonly desc: ValueDescription) {
+        this.root = this.builder.createHexagon();
         this.render();
     }
 
@@ -14,7 +18,6 @@ export class DynamoValue {
     }
 
     public render() {
-        this.root = this.builder.createHexagon();
         if (this.desc?.new) {
             this.root.addClass("dynamo-slot-filled-value");
         } else {
@@ -29,7 +32,7 @@ export class DynamoValue {
             this.nameHolder = this.builder.createText(visibleText);
             this.nameHolder.addClass("dynamo-slot-value-text");
             let metrics = this.builder.textToSVG.getMetrics(visibleText, { fontSize: 22 });
-            let minWidth = metrics.width + 34;
+            let minWidth = metrics.width + DynamoValue.emptyTextWidth;
             if (this.root.width() < minWidth) {
                 this.root.width(minWidth);
             }

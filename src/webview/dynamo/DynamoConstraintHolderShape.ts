@@ -1,7 +1,8 @@
-import { Box, G, Polygon, NumberAlias } from "@svgdotjs/svg.js";
+import { Box, Svg, Polygon, NumberAlias } from "@svgdotjs/svg.js";
 import { addPoint, Point } from "../utils";
+import DynamoContainer from "./DynamoContainer";
 
-export class DynamoConstraintHolderShape extends G {
+export class DynamoConstraintHolderShape extends DynamoContainer {
     private polygonChild: Polygon;
     constructor(width: number, height: number, private arcRad: number) {
         super();

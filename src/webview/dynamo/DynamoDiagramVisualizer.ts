@@ -1,9 +1,9 @@
 import { DiagramDescription, EntityDescription } from "./Descriptors";
 import { DynamoShapeBuilder } from "./DynamoShapeBuilder";
-import "./webview-style.scss";
 import { DynamoEntity } from "./DynamoEntity";
 import * as dagre from "dagre";
 import { DynamoArrow } from "./DynamoArrow";
+import "./webview-style.scss";
 
 export class DynamoDiagramVisualizer {
     constructor(private readonly builder: DynamoShapeBuilder) {}
@@ -32,8 +32,8 @@ export class DynamoDiagramVisualizer {
             }
 
             g.setNode(key, { width: root.width(), height: root.height() });
-            if (entity.desc.parent != null) {
-                g.setEdge(entity.desc.parent, key);
+            if (entity.description.parent != null) {
+                g.setEdge(entity.description.parent, key);
             }
         }
 
